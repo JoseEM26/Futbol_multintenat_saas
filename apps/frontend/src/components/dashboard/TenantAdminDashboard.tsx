@@ -144,6 +144,24 @@ export function CanchasManager({ canchas, tenantId, planLimit }: { canchas: any[
   const [editing, setEditing] = useState<any>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [editImagePreview, setEditImagePreview] = useState<string | null>(null);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, isEdit = false) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      alert("La imagen no debe pesar más de 2MB");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64 = reader.result as string;
+      if (isEdit) setEditImagePreview(base64);
+      else setImagePreview(base64);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleCreate = async (e: any) => {
     e.preventDefault();
@@ -152,14 +170,36 @@ export function CanchasManager({ canchas, tenantId, planLimit }: { canchas: any[
     const res = await createCanchaAction(tenantId, {
       name: e.target.name.value,
       description: e.target.description.value,
-      pricePerHour: Number(e.target.price.value)
+      pricePerHour: Number(e.target.price.value),
+      image: imagePreview || undefined
     });
     setLoading(false);
     if(res.success) {
       setIsCreating(false);
+      setImagePreview(null);
     } else {
       alert("Error: " + res.error);
     }
+  };
+
+  const handleChangeImageDirect = async (canchaId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { alert("La imagen no debe pesar más de 2MB"); return; }
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64 = reader.result as string;
+      const { updateCanchaAction } = await import("@/app/actions/admin");
+      const cancha = canchas.find(c => c.id === canchaId);
+      if (!cancha) return;
+      await updateCanchaAction(canchaId, {
+        name: cancha.name,
+        description: cancha.description || "",
+        pricePerHour: cancha.pricePerHour,
+        image: base64
+      });
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -202,9 +242,10 @@ export function CanchasManager({ canchas, tenantId, planLimit }: { canchas: any[
                    <span className="text-slate-300 font-bold uppercase tracking-widest text-xs">Sin Foto</span>
                 </div>
               )}
-              <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-6">
-                <button className="bg-white text-slate-900 px-6 py-3 rounded-2xl font-black text-sm shadow-xl hover:bg-slate-50 transition-all">Cambiar Imagen</button>
-              </div>
+              <label className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-6 cursor-pointer">
+                <span className="bg-white text-slate-900 px-6 py-3 rounded-2xl font-black text-sm shadow-xl hover:bg-slate-50 transition-all">Cambiar Imagen</span>
+                <input type="file" accept="image/*" className="hidden" onChange={(e) => handleChangeImageDirect(cancha.id, e)} />
+              </label>
             </div>
             <div className="p-8 space-y-4">
               <div className="flex justify-between items-start">
@@ -214,7 +255,7 @@ export function CanchasManager({ canchas, tenantId, planLimit }: { canchas: any[
               <p className="text-slate-500 font-medium line-clamp-3 leading-relaxed">{cancha.description}</p>
               
               <div className="flex gap-3 pt-6 border-t border-slate-50">
-                <button onClick={() => setEditing(cancha)} className="flex-1 bg-slate-100 text-slate-800 font-black py-4 rounded-2xl text-sm hover:bg-slate-200 transition-all">Editar</button>
+                <button onClick={() => { setEditing(cancha); setEditImagePreview(cancha.image || null); }} className="flex-1 bg-slate-100 text-slate-800 font-black py-4 rounded-2xl text-sm hover:bg-slate-200 transition-all">Editar</button>
                 <button 
                   onClick={async () => {
                     if(confirm("¿Seguro que deseas eliminar esta cancha?")) {
@@ -235,12 +276,28 @@ export function CanchasManager({ canchas, tenantId, planLimit }: { canchas: any[
       {/* Modal Nueva Cancha */}
       {isCreating && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[100] flex items-center justify-center p-6">
-          <form className="bg-white rounded-[48px] w-full max-w-xl p-10 space-y-8 animate-in zoom-in duration-300" onSubmit={handleCreate}>
+          <form className="bg-white rounded-[48px] w-full max-w-xl p-10 space-y-8 animate-in zoom-in duration-300 max-h-[90vh] overflow-y-auto" onSubmit={handleCreate}>
             <div className="flex justify-between items-center">
               <h3 className="text-3xl font-black text-slate-900 tracking-tight">Nueva Cancha</h3>
-              <button type="button" onClick={() => setIsCreating(false)} className="p-3 bg-slate-100 rounded-2xl hover:bg-slate-200 transition-all"><X className="w-6 h-6 text-slate-400" /></button>
+              <button type="button" onClick={() => { setIsCreating(false); setImagePreview(null); }} className="p-3 bg-slate-100 rounded-2xl hover:bg-slate-200 transition-all"><X className="w-6 h-6 text-slate-400" /></button>
             </div>
             <div className="space-y-6">
+              {/* Image Upload */}
+              <div className="space-y-2">
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-4">Foto de la Cancha</label>
+                <label className="block w-full aspect-video bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl overflow-hidden cursor-pointer hover:border-emerald-400 transition-colors relative">
+                  {imagePreview ? (
+                    <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center gap-3">
+                      <ImageIcon className="w-12 h-12 text-slate-300" />
+                      <span className="text-slate-400 font-bold text-sm">Haz clic para subir una imagen</span>
+                      <span className="text-slate-300 text-xs">Máx. 2MB • JPG, PNG, WEBP</span>
+                    </div>
+                  )}
+                  <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageChange(e, false)} />
+                </label>
+              </div>
               <div className="space-y-2">
                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-4">Nombre de la Cancha</label>
                  <input name="name" required placeholder="Ej. Cancha Principal N°1" className="w-full bg-slate-50 border-2 border-slate-50 p-5 rounded-3xl focus:outline-none focus:border-emerald-500/50 font-bold" />
@@ -268,7 +325,7 @@ export function CanchasManager({ canchas, tenantId, planLimit }: { canchas: any[
       {editing && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[100] flex items-center justify-center p-6">
           <form 
-            className="bg-white rounded-[48px] w-full max-w-xl p-10 space-y-8 animate-in zoom-in duration-300"
+            className="bg-white rounded-[48px] w-full max-w-xl p-10 space-y-8 animate-in zoom-in duration-300 max-h-[90vh] overflow-y-auto"
             onSubmit={async (e: any) => {
               e.preventDefault();
               setLoading(true);
@@ -276,18 +333,35 @@ export function CanchasManager({ canchas, tenantId, planLimit }: { canchas: any[
               const res = await updateCanchaAction(editing.id, {
                 name: e.target.name.value,
                 description: e.target.description.value,
-                pricePerHour: Number(e.target.price.value)
+                pricePerHour: Number(e.target.price.value),
+                image: editImagePreview || undefined
               });
               setLoading(false);
-              if(res.success) setEditing(null);
+              if(res.success) { setEditing(null); setEditImagePreview(null); }
               else alert("Error: " + res.error);
             }}
           >
             <div className="flex justify-between items-center">
               <h3 className="text-3xl font-black text-slate-900 tracking-tight">Editar Detalle</h3>
-              <button type="button" onClick={() => setEditing(null)} className="p-3 bg-slate-100 rounded-2xl hover:bg-slate-200 transition-all"><X className="w-6 h-6 text-slate-400" /></button>
+              <button type="button" onClick={() => { setEditing(null); setEditImagePreview(null); }} className="p-3 bg-slate-100 rounded-2xl hover:bg-slate-200 transition-all"><X className="w-6 h-6 text-slate-400" /></button>
             </div>
             <div className="space-y-6">
+              {/* Image Upload */}
+              <div className="space-y-2">
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-4">Foto de la Cancha</label>
+                <label className="block w-full aspect-video bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl overflow-hidden cursor-pointer hover:border-emerald-400 transition-colors relative">
+                  {editImagePreview ? (
+                    <img src={editImagePreview} alt="Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center gap-3">
+                      <ImageIcon className="w-12 h-12 text-slate-300" />
+                      <span className="text-slate-400 font-bold text-sm">Haz clic para subir o cambiar imagen</span>
+                      <span className="text-slate-300 text-xs">Máx. 2MB • JPG, PNG, WEBP</span>
+                    </div>
+                  )}
+                  <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageChange(e, true)} />
+                </label>
+              </div>
               <div className="space-y-2">
                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-4">Nombre</label>
                  <input name="name" required defaultValue={editing.name} className="w-full bg-slate-50 border-2 border-slate-50 p-5 rounded-3xl focus:outline-none focus:border-emerald-500/50 font-bold" />
@@ -308,6 +382,7 @@ export function CanchasManager({ canchas, tenantId, planLimit }: { canchas: any[
         </div>
       )}
     </div>
+
   );
 }
 
