@@ -118,12 +118,13 @@ export function TourGuide({ steps, userId, persist = false, onComplete }: TourGu
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 z-[200]">
+    <div className="fixed inset-0 z-[202]">
       <div className="absolute inset-0 bg-slate-900/40 cursor-pointer" onClick={handleComplete} />
       
+      {/* Modal - uses fixed positioning so it never leaves the viewport */}
       <div 
         ref={modalRef}
-        className="fixed w-[calc(100vw-40px)] max-w-[400px] bg-white rounded-[40px] shadow-[0_30px_80px_-10px_rgba(0,0,0,0.35)] pointer-events-auto border border-slate-100 overflow-hidden"
+        className="fixed w-[calc(100vw-40px)] max-w-[400px] bg-white rounded-[40px] shadow-[0_30px_80px_-10px_rgba(0,0,0,0.35)] pointer-events-auto border border-slate-100 overflow-hidden z-[210]"
         style={{ 
           top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
           transition: 'top 0.5s cubic-bezier(0.22, 1, 0.36, 1), left 0.5s cubic-bezier(0.22, 1, 0.36, 1)' 
