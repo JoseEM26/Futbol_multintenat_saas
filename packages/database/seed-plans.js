@@ -2,60 +2,58 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Seeding plans...');
+  console.log('🌱 Actualizando planes con límites de canchas...');
 
   const plans = [
     {
-      name: 'Gratis (Prueba)',
+      id: 'trial',
+      name: 'Prueba Gratis (1 Mes)',
       price: 0,
-      oldPrice: null,
-      description: 'Ideal para probar la plataforma por un mes.',
-      features: 'Hasta 2 canchas, Calendario básico, 30 días de prueba',
+      oldPrice: 0,
+      description: 'Ideal para probar la plataforma sin compromiso.',
+      features: 'Gestión de 1 Cancha, Calendario de Reservas, Soporte por Correo, Panel de Control Básico',
       isTrial: true,
       durationDays: 30,
-      status: 'ACTIVE',
+      maxCanchas: 1,
+      status: 'ACTIVE'
     },
     {
-      name: 'Básico',
+      id: 'basico',
+      name: 'Plan Básico',
       price: 30,
-      oldPrice: 50,
-      description: 'Gestión profesional para tu local deportivo.',
-      features: 'Canchas ilimitadas, Calendario avanzado, Soporte prioritario',
+      oldPrice: 45,
+      description: 'Todo lo necesario para digitalizar tu complejo deportivo.',
+      features: 'Gestión de hasta 5 Canchas, Calendario Avanzado, Reportes de Ventas, Soporte Prioritario, Pagos con Yape/Plin',
       isTrial: false,
       durationDays: 30,
-      status: 'ACTIVE',
+      maxCanchas: 5,
+      status: 'ACTIVE'
     },
     {
-      name: 'Premium',
+      id: 'premium',
+      name: 'Plan Premium (Próximamente)',
       price: 80,
-      oldPrice: null,
-      description: 'Próximamente: Pagos automáticos y reportes financieros.',
-      features: 'Múltiples locales, Pasarela de pagos, Reportes BI',
+      oldPrice: 120,
+      description: 'Gestión masiva y automatización total para complejos grandes.',
+      features: 'Canchas Ilimitadas, Pasarela de Pagos Automática, API para Integraciones, Reportes Financieros VIP, Marketing Digital',
       isTrial: false,
       durationDays: 30,
-      status: 'COMING_SOON',
+      maxCanchas: 999,
+      status: 'COMING_SOON'
     }
   ];
 
   for (const plan of plans) {
     await prisma.plan.upsert({
-      where: { id: plan.name === 'Gratis (Prueba)' ? 'trial' : plan.name === 'Básico' ? 'basic' : 'premium' },
+      where: { id: plan.id },
       update: plan,
-      create: {
-        id: plan.name === 'Gratis (Prueba)' ? 'trial' : plan.name === 'Básico' ? 'basic' : 'premium',
-        ...plan,
-      },
+      create: plan,
     });
   }
 
-  console.log('✅ Plans seeded successfully.');
+  console.log('✅ Planes actualizados correctamente.');
 }
 
 main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+  .catch(console.error)
+  .finally(() => prisma.$disconnect());

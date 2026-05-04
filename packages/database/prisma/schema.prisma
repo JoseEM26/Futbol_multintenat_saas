@@ -10,16 +10,24 @@ datasource db {
 model Tenant {
   id        String   @id @default(cuid())
   name      String   @unique
+  slug      String?  @unique @default(cuid())
   logo      String?  @db.Text // Base64 image
   phone     String?  // Para Yape/Plin
+  yapeName  String?  // Nombre titular Yape
+  location  String?
+  description String?
+  openingHours String? // Ej: 8am - 11pm
+  pricePerHour Float?
+  ownerName   String?
+  managerName String?
   canchas   Cancha[]
   users     User[]
   
-  // Plan details
-  planId    String?
-  plan      Plan?    @relation(fields: [planId], references: [id])
-  planExpiresAt DateTime?
-  isActive  Boolean  @default(true)
+  // Subscription fields
+  planId         String?   @default("trial")
+  plan           Plan?     @relation(fields: [planId], references: [id])
+  planExpiresAt  DateTime?
+  isActive       Boolean   @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -105,6 +113,7 @@ model Plan {
   features    String?
   isTrial     Boolean  @default(false)
   durationDays Int     @default(30)
+  maxCanchas   Int     @default(1)
   status      String   @default("ACTIVE") // ACTIVE, COMING_SOON
   tenants     Tenant[]
   createdAt   DateTime @default(now())
