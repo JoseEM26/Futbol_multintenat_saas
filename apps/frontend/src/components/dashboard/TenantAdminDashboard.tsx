@@ -13,30 +13,39 @@ import {
 } from "lucide-react";
 import { CustomModal } from "@/components/ui/CustomModal";
 import { TourGuide } from "@/components/dashboard/TourGuide";
+import { dashboardTourSteps, canchasTourSteps, perfilTourSteps } from "@/components/dashboard/tourSteps";
 import Link from "next/link";
 
 export function TenantAdminDashboard({ stats, user }: { stats: any, user: any }) {
   const [activeTab, setActiveTab] = useState<"DASHBOARD" | "CANCHAS" | "PERFIL">("DASHBOARD");
   const [showTour, setShowTour] = useState(!user?.hasSeenTour);
+  const [activeTourModule, setActiveTourModule] = useState<"DASHBOARD" | "CANCHAS" | "PERFIL">("DASHBOARD");
 
   // Listen for "Ver Tutorial" button in sidebar
   useEffect(() => {
     const handler = () => {
-      setActiveTab("DASHBOARD");
+      setActiveTourModule(activeTab);
       setShowTour(true);
     };
     window.addEventListener('replay-tour', handler);
     return () => window.removeEventListener('replay-tour', handler);
-  }, []);
+  }, [activeTab]);
+
+  const currentTourSteps = activeTourModule === "CANCHAS" ? canchasTourSteps 
+    : activeTourModule === "PERFIL" ? perfilTourSteps 
+    : dashboardTourSteps;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
       {showTour && (
         <TourGuide 
-          userId={user?.id} 
+          steps={currentTourSteps}
+          userId={user?.id}
+          persist={activeTourModule === "DASHBOARD"}
           onComplete={() => setShowTour(false)} 
         />
       )}
+
 
       {/* Header and Tabs */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -103,15 +112,29 @@ export function TenantAdminDashboard({ stats, user }: { stats: any, user: any })
       )}
 
       {activeTab === "CANCHAS" && (
-        <CanchasManager 
-          canchas={stats.myCanchas || []} 
-          tenantId={stats.tenantProfile?.id} 
-          planLimit={stats.tenantProfile?.plan?.maxCanchas || 1}
-        />
+        <div>
+          <div className="flex justify-end mb-4">
+            <button onClick={() => { setActiveTourModule('CANCHAS'); setShowTour(true); }} className="flex items-center gap-2 text-sm font-bold text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 px-4 py-2 rounded-xl border border-dashed border-amber-200 transition-all">
+              <HelpCircle className="w-4 h-4" /> Ver Tutorial de Canchas
+            </button>
+          </div>
+          <CanchasManager 
+            canchas={stats.myCanchas || []} 
+            tenantId={stats.tenantProfile?.id} 
+            planLimit={stats.tenantProfile?.plan?.maxCanchas || 1}
+          />
+        </div>
       )}
 
       {activeTab === "PERFIL" && (
-        <TenantProfileManager profile={stats.tenantProfile} />
+        <div>
+          <div className="flex justify-end mb-4">
+            <button onClick={() => { setActiveTourModule('PERFIL'); setShowTour(true); }} className="flex items-center gap-2 text-sm font-bold text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 px-4 py-2 rounded-xl border border-dashed border-amber-200 transition-all">
+              <HelpCircle className="w-4 h-4" /> Ver Tutorial de Configuración
+            </button>
+          </div>
+          <TenantProfileManager profile={stats.tenantProfile} />
+        </div>
       )}
     </div>
   );
@@ -141,12 +164,13 @@ export function CanchasManager({ canchas, tenantId, planLimit }: { canchas: any[
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="flex justify-between items-center bg-white p-8 rounded-[40px] border border-slate-100 shadow-sm">
+      <div id="canchas-header" className="flex justify-between items-center bg-white p-8 rounded-[40px] border border-slate-100 shadow-sm">
         <div>
           <h3 className="text-2xl font-black text-slate-900">Mis Espacios Deportivos</h3>
           <p className="text-slate-500 font-medium">Tienes {canchas.length} de {planLimit} canchas permitidas.</p>
         </div>
         <button 
+          id="canchas-new-btn"
           onClick={() => setIsCreating(true)}
           disabled={canchas.length >= planLimit}
           className={`flex items-center gap-2 px-8 py-4 rounded-2xl font-black text-lg transition-all shadow-xl ${
@@ -166,7 +190,7 @@ export function CanchasManager({ canchas, tenantId, planLimit }: { canchas: any[
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+      <div id="canchas-list" className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
         {canchas.map(cancha => (
           <div key={cancha.id} className="bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-hidden group hover:shadow-2xl hover:shadow-slate-200/50 transition-all duration-300">
             <div className="aspect-[4/3] w-full bg-slate-50 relative overflow-hidden">
@@ -333,8 +357,8 @@ export function TenantProfileManager({ profile }: { profile: any }) {
     <div className="max-w-5xl animate-in fade-in slide-in-from-right-8 duration-700">
       <form onSubmit={handleSubmit} className="space-y-12">
         {/* Basic Info Section */}
-        <div className="bg-white p-10 rounded-[48px] border border-slate-100 shadow-sm space-y-10">
-          <div className="flex items-center gap-4">
+        <div id="perfil-basic" className="bg-white p-10 rounded-[48px] border border-slate-100 shadow-sm space-y-10">
+          <div id="perfil-header" className="flex items-center gap-4">
              <Settings className="w-8 h-8 text-emerald-600" />
              <h3 className="text-3xl font-black text-slate-900 tracking-tight">Perfil de tu Complejo</h3>
           </div>
@@ -364,7 +388,7 @@ export function TenantProfileManager({ profile }: { profile: any }) {
         </div>
 
         {/* Details & Location */}
-        <div className="bg-white p-10 rounded-[48px] border border-slate-100 shadow-sm space-y-10">
+        <div id="perfil-location" className="bg-white p-10 rounded-[48px] border border-slate-100 shadow-sm space-y-10">
           <div className="flex items-center gap-4">
              <MapPin className="w-8 h-8 text-blue-600" />
              <h3 className="text-3xl font-black text-slate-900 tracking-tight">Detalles y Ubicación</h3>
@@ -403,7 +427,7 @@ export function TenantProfileManager({ profile }: { profile: any }) {
         </div>
 
         {/* Payments & Staff */}
-        <div className="bg-white p-10 rounded-[48px] border border-slate-100 shadow-sm space-y-10">
+        <div id="perfil-payments" className="bg-white p-10 rounded-[48px] border border-slate-100 shadow-sm space-y-10">
           <div className="flex items-center gap-4">
              <UserIcon className="w-8 h-8 text-amber-600" />
              <h3 className="text-3xl font-black text-slate-900 tracking-tight">Pagos y Personal</h3>
