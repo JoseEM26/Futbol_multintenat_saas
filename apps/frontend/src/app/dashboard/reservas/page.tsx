@@ -47,8 +47,6 @@ export default async function ReservasPage() {
     orderBy: { createdAt: "asc" }
   });
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
   const endOfWeek = new Date(today);
   endOfWeek.setDate(endOfWeek.getDate() + 7);
 
