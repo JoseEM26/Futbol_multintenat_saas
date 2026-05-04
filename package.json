@@ -1,0 +1,20 @@
+{
+  "name": "cancha-futbol-saas",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run db:push -w @cancha/database && concurrently \"npm run dev -w @cancha/frontend\" \"npm run start:dev -w @cancha/backend\"",
+    "build": "npm run build --workspaces"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "better-auth": "^1.6.9"
+  }
+}

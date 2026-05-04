@@ -1,0 +1,189 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  logo      String?  @db.Text // Base64 image
+  phone     String?  // Para Yape/Plin
+  canchas   Cancha[]
+  users     User[]
+  
+  // Plan details
+  planId    String?
+  plan      Plan?    @relation(fields: [planId], references: [id])
+  planExpiresAt DateTime?
+  isActive  Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  password      String?
+  emailVerified Boolean   @default(false)
+  image         String?   @db.Text
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  sessions      Session[]
+  accounts      Account[]
+
+  // Custom Fields
+  tenantId      String?
+  tenant        Tenant?   @relation(fields: [tenantId], references: [id])
+  role          Role      @default(TENANT_ADMIN)
+  reservations  Reservation[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?   @db.Text
+  refreshToken          String?   @db.Text
+  idToken               String?   @db.Text
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?   @db.Text
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @updatedAt
+
+  @@map("verification")
+}
+
+enum Role {
+  SUPER_ADMIN
+  TENANT_ADMIN
+}
+
+model Plan {
+  id          String   @id @default(cuid())
+  name        String
+  price       Float
+  oldPrice    Float?
+  description String?
+  features    String?
+  isTrial     Boolean  @default(false)
+  durationDays Int     @default(30)
+  status      String   @default("ACTIVE") // ACTIVE, COMING_SOON
+  tenants     Tenant[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Cancha {
+  id          String   @id @default(cuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  name        String
+  description String?
+  pricePerHour Float
+  image       String?  @db.Text // Base64 image
+  
+  // Configuraciones de pago
+  allowAdvance     Boolean @default(true)
+  allowNoAdvance   Boolean @default(true)
+  defaultAdvance   Float?  // Monto fijo de adelanto
+  
+  details     CanchaDetail?
+  openingHours OpeningHours[]
+  reservations Reservation[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CanchaDetail {
+  id            String   @id @default(cuid())
+  canchaId      String   @unique
+  cancha        Cancha   @relation(fields: [canchaId], references: [id], onDelete: Cascade)
+  surfaceType   String?  // Ej. "Césped Sintético", "Césped Natural", "Losa"
+  gameType      String?  // Ej. "Fútbol 5", "Fútbol 7", "Fútbol 11"
+  playersPerSide Int?    // Ej. 5, 7, 11 (Opcional)
+  hasLighting   Boolean  @default(true)
+  hasShowers    Boolean  @default(false)
+  hasParking    Boolean  @default(false)
+  hasDressingRooms Boolean @default(false)
+  rules         String?  @db.Text
+  amenities     String?  // Ej. "Agua gratis, Chalecos included"
+}
+
+model OpeningHours {
+  id        String   @id @default(cuid())
+  canchaId  String
+  cancha    Cancha   @relation(fields: [canchaId], references: [id], onDelete: Cascade)
+  dayOfWeek Int      // 0-6 (Domingo a Sábado)
+  openTime  String   // "08:00"
+  closeTime String   // "22:00"
+  isClosed  Boolean  @default(false)
+
+  @@unique([canchaId, dayOfWeek])
+}
+
+model Reservation {
+  id          String   @id @default(cuid())
+  canchaId    String
+  cancha      Cancha   @relation(fields: [canchaId], references: [id])
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+  
+  // Para reservas rápidas
+  userName    String?
+  userPhone   String?
+  
+  startTime   DateTime
+  endTime     DateTime
+  totalPrice  Float
+  status      ReservationStatus @default(PENDIENTE)
+  paymentType String @default("ADELANTO") // "ADELANTO" o "PALABRA"
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum ReservationStatus {
+  PENDIENTE
+  CONFIRMADO
+  CANCELADO
+  VENCIDO
+  PALABRA
+}
