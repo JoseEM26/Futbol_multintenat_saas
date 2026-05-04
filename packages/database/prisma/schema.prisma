@@ -129,6 +129,8 @@ model Cancha {
   description String?
   pricePerHour Float
   image       String?  @db.Text // Base64 image
+  sede        String?  // Nombre de la sede (ej. "Sede Norte", "Sede Centro")
+  sedeAddress String?  // Dirección de la sede
   
   // Configuraciones de pago
   allowAdvance     Boolean @default(true)

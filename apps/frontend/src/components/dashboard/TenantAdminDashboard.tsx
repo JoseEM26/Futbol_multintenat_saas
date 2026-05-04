@@ -171,7 +171,9 @@ export function CanchasManager({ canchas, tenantId, planLimit }: { canchas: any[
       name: e.target.name.value,
       description: e.target.description.value,
       pricePerHour: Number(e.target.price.value),
-      image: imagePreview || undefined
+      image: imagePreview || undefined,
+      sede: e.target.sede?.value || undefined,
+      sedeAddress: e.target.sedeAddress?.value || undefined
     });
     setLoading(false);
     if(res.success) {
@@ -253,6 +255,13 @@ export function CanchasManager({ canchas, tenantId, planLimit }: { canchas: any[
                 <div className="bg-emerald-50 text-emerald-600 px-4 py-1 rounded-full font-black text-xs">S/ {Number(cancha.pricePerHour).toFixed(0)}/hr</div>
               </div>
               <p className="text-slate-500 font-medium line-clamp-3 leading-relaxed">{cancha.description}</p>
+              {cancha.sede && (
+                <div className="flex items-center gap-2 text-sm">
+                  <MapPin className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                  <span className="font-bold text-blue-600">{cancha.sede}</span>
+                  {cancha.sedeAddress && <span className="text-slate-400">— {cancha.sedeAddress}</span>}
+                </div>
+              )}
               
               <div className="flex gap-3 pt-6 border-t border-slate-50">
                 <button onClick={() => { setEditing(cancha); setEditImagePreview(cancha.image || null); }} className="flex-1 bg-slate-100 text-slate-800 font-black py-4 rounded-2xl text-sm hover:bg-slate-200 transition-all">Editar</button>
@@ -313,6 +322,24 @@ export function CanchasManager({ canchas, tenantId, planLimit }: { canchas: any[
                     <input name="price" type="number" required placeholder="50" className="w-full bg-slate-50 border-2 border-slate-50 p-5 pl-12 rounded-3xl focus:outline-none focus:border-emerald-500/50 font-bold" />
                  </div>
               </div>
+              {planLimit > 1 && (
+                <>
+                  <div className="space-y-2">
+                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-4">Sede / Sucursal</label>
+                    <div className="relative">
+                      <Building className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300" />
+                      <input name="sede" required placeholder="Ej. Sede Norte, Local Centro" className="w-full bg-slate-50 border-2 border-slate-50 p-5 pl-14 rounded-3xl focus:outline-none focus:border-emerald-500/50 font-bold" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-4">Dirección de la Sede</label>
+                    <div className="relative">
+                      <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300" />
+                      <input name="sedeAddress" required placeholder="Ej. Av. Los Héroes 123, Distrito" className="w-full bg-slate-50 border-2 border-slate-50 p-5 pl-14 rounded-3xl focus:outline-none focus:border-emerald-500/50 font-bold" />
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
             <button type="submit" disabled={loading} className="w-full bg-emerald-600 text-white font-black py-6 rounded-3xl text-xl shadow-2xl shadow-emerald-600/30 hover:bg-emerald-700 transition-all">
               {loading ? "Creando..." : "Registrar Cancha"}
@@ -334,7 +361,9 @@ export function CanchasManager({ canchas, tenantId, planLimit }: { canchas: any[
                 name: e.target.name.value,
                 description: e.target.description.value,
                 pricePerHour: Number(e.target.price.value),
-                image: editImagePreview || undefined
+                image: editImagePreview || undefined,
+                sede: e.target.sede?.value,
+                sedeAddress: e.target.sedeAddress?.value
               });
               setLoading(false);
               if(res.success) { setEditing(null); setEditImagePreview(null); }
@@ -374,6 +403,24 @@ export function CanchasManager({ canchas, tenantId, planLimit }: { canchas: any[
                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-4">Precio (S/)</label>
                  <input name="price" type="number" required defaultValue={editing.pricePerHour} className="w-full bg-slate-50 border-2 border-slate-50 p-5 rounded-3xl focus:outline-none focus:border-emerald-500/50 font-bold" />
               </div>
+              {planLimit > 1 && (
+                <>
+                  <div className="space-y-2">
+                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-4">Sede / Sucursal</label>
+                    <div className="relative">
+                      <Building className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300" />
+                      <input name="sede" required defaultValue={editing.sede} placeholder="Ej. Sede Norte" className="w-full bg-slate-50 border-2 border-slate-50 p-5 pl-14 rounded-3xl focus:outline-none focus:border-emerald-500/50 font-bold" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-4">Dirección de la Sede</label>
+                    <div className="relative">
+                      <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300" />
+                      <input name="sedeAddress" required defaultValue={editing.sedeAddress} placeholder="Ej. Av. Los Héroes 123" className="w-full bg-slate-50 border-2 border-slate-50 p-5 pl-14 rounded-3xl focus:outline-none focus:border-emerald-500/50 font-bold" />
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
             <button type="submit" disabled={loading} className="w-full bg-slate-900 text-white font-black py-6 rounded-3xl text-xl shadow-2xl shadow-slate-900/30 hover:bg-slate-800 transition-all">
                {loading ? "Guardando..." : "Actualizar Información"}

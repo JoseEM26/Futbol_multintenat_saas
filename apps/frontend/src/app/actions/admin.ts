@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 // TENANT ADMIN ACTIONS
 // ==========================================
 
-export async function createCanchaAction(tenantId: string, data: { name: string; description: string; pricePerHour: number; image?: string }) {
+export async function createCanchaAction(tenantId: string, data: { name: string; description: string; pricePerHour: number; image?: string; sede?: string; sedeAddress?: string }) {
   try {
     // 1. Check plan limit
     const tenant = await prisma.tenant.findUnique({
@@ -34,6 +34,8 @@ export async function createCanchaAction(tenantId: string, data: { name: string;
         description: data.description,
         pricePerHour: data.pricePerHour,
         image: data.image || null,
+        sede: data.sede || null,
+        sedeAddress: data.sedeAddress || null,
         tenantId
       }
     });
@@ -45,7 +47,7 @@ export async function createCanchaAction(tenantId: string, data: { name: string;
   }
 }
 
-export async function updateCanchaAction(canchaId: string, data: { name: string; description: string; pricePerHour: number; image?: string }) {
+export async function updateCanchaAction(canchaId: string, data: { name: string; description: string; pricePerHour: number; image?: string; sede?: string; sedeAddress?: string }) {
   try {
     await prisma.cancha.update({
       where: { id: canchaId },
@@ -53,7 +55,9 @@ export async function updateCanchaAction(canchaId: string, data: { name: string;
         name: data.name,
         description: data.description,
         pricePerHour: data.pricePerHour,
-        ...(data.image && { image: data.image })
+        ...(data.image && { image: data.image }),
+        ...(data.sede !== undefined && { sede: data.sede || null }),
+        ...(data.sedeAddress !== undefined && { sedeAddress: data.sedeAddress || null })
       }
     });
     revalidatePath("/dashboard/canchas");
