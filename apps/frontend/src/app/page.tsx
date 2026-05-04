@@ -1,19 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@cancha/database";
-import { CalendarCheck, Shield, Zap, Trophy, MapPin, Star, Check, Phone, Mail, User, Building, ArrowRight } from "lucide-react";
+import { CalendarCheck, Shield, Zap, Trophy, MapPin, Star, Check, Phone, Mail, User, Building, ArrowRight, ShieldCheck } from "lucide-react";
 import { TenantRegistrationForm } from "@/components/landing/TenantRegistrationForm";
 
 export const dynamic = "force-dynamic";
 
 export default async function LandingPage() {
-  const canchas = await prisma.cancha.findMany({
-    include: { 
-      tenant: true,
-      details: true
-    },
-    orderBy: { createdAt: 'desc' },
-    take: 6
+  const complexes = await prisma.tenant.findMany({
+    take: 6,
+    orderBy: { createdAt: 'desc' }
   });
 
   const planes = await prisma.plan.findMany({
