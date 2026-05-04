@@ -48,6 +48,7 @@ export function TourGuide({ userId, onComplete }: { userId: string, onComplete: 
   const [currentStep, setCurrentStep] = useState(0);
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [isVisible, setIsVisible] = useState(false);
+  const [isMoving, setIsMoving] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -88,15 +89,22 @@ export function TourGuide({ userId, onComplete }: { userId: string, onComplete: 
       
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
       element.classList.add('ring-4', 'ring-emerald-500', 'ring-offset-4', 'transition-all', 'duration-500', 'rounded-2xl', 'z-[150]', 'relative');
+      
+      // Unlock buttons after transition finishes
+      setTimeout(() => setIsMoving(false), 600);
     } else {
       setPosition({
         top: window.innerHeight / 2 + window.scrollY - 100,
         left: Math.max(20, (window.innerWidth - 350) / 2)
       });
+      setTimeout(() => setIsMoving(false), 600);
     }
   };
 
   const nextStep = () => {
+    if (isMoving) return;
+    setIsMoving(true);
+    
     const element = document.getElementById(steps[currentStep].target);
     if (element) {
       element.classList.remove('ring-4', 'ring-emerald-500', 'ring-offset-4', 'z-[150]', 'relative');
@@ -110,6 +118,9 @@ export function TourGuide({ userId, onComplete }: { userId: string, onComplete: 
   };
 
   const prevStep = () => {
+    if (isMoving) return;
+    setIsMoving(true);
+
     const element = document.getElementById(steps[currentStep].target);
     if (element) {
       element.classList.remove('ring-4', 'ring-emerald-500', 'ring-offset-4', 'z-[150]', 'relative');
@@ -165,13 +176,18 @@ export function TourGuide({ userId, onComplete }: { userId: string, onComplete: 
           
           <div className="flex gap-3">
             {currentStep > 0 && (
-              <button onClick={prevStep} className="p-4 bg-slate-50 text-slate-400 rounded-2xl hover:bg-slate-100 hover:text-slate-600 transition-all">
+              <button 
+                onClick={prevStep} 
+                disabled={isMoving}
+                className="p-4 bg-slate-50 text-slate-400 rounded-2xl hover:bg-slate-100 hover:text-slate-600 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+              >
                 <ArrowLeft className="w-6 h-6" />
               </button>
             )}
             <button 
               onClick={nextStep}
-              className="group flex items-center gap-2 bg-slate-900 text-white px-7 py-4 rounded-2xl font-black text-base hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20 active:scale-95"
+              disabled={isMoving}
+              className="group flex items-center gap-2 bg-slate-900 text-white px-7 py-4 rounded-2xl font-black text-base hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {currentStep === steps.length - 1 ? "¡Listo!" : "Siguiente"}
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -182,7 +198,7 @@ export function TourGuide({ userId, onComplete }: { userId: string, onComplete: 
         <div className="mt-8 pt-8 border-t border-slate-100 flex justify-between items-center">
            <button onClick={handleComplete} className="text-xs font-black text-slate-300 hover:text-slate-900 transition-colors uppercase tracking-widest">Omitir Tour</button>
            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+              <span className={`w-2 h-2 bg-emerald-500 rounded-full ${isMoving ? 'animate-ping' : 'animate-pulse'}`} />
               <div className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Guía CanchaSync v1.0</div>
            </div>
         </div>
