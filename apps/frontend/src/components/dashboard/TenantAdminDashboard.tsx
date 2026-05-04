@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell
@@ -18,6 +18,16 @@ import Link from "next/link";
 export function TenantAdminDashboard({ stats, user }: { stats: any, user: any }) {
   const [activeTab, setActiveTab] = useState<"DASHBOARD" | "CANCHAS" | "PERFIL">("DASHBOARD");
   const [showTour, setShowTour] = useState(!user?.hasSeenTour);
+
+  // Listen for "Ver Tutorial" button in sidebar
+  useEffect(() => {
+    const handler = () => {
+      setActiveTab("DASHBOARD");
+      setShowTour(true);
+    };
+    window.addEventListener('replay-tour', handler);
+    return () => window.removeEventListener('replay-tour', handler);
+  }, []);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
