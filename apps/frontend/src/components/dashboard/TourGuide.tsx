@@ -63,27 +63,44 @@ export function TourGuide({ userId, onComplete }: { userId: string, onComplete: 
     
     if (element) {
       const rect = element.getBoundingClientRect();
-      const isMobile = window.innerWidth < 768;
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const modalWidth = 350;
+      const modalHeight = 250; // Approximate
       
-      setPosition({
-        top: rect.bottom + window.scrollY + 20,
-        left: isMobile ? 20 : rect.left + window.scrollX
-      });
+      let top = rect.bottom + window.scrollY + 20;
+      let left = rect.left + window.scrollX;
+
+      // Adjust if it goes off-screen horizontally
+      if (left + modalWidth > viewportWidth - 20) {
+        left = viewportWidth - modalWidth - 20;
+      }
+      if (left < 20) {
+        left = 20;
+      }
+
+      // Adjust if it goes off-screen vertically
+      if (rect.bottom + modalHeight > viewportHeight - 20) {
+        top = rect.top + window.scrollY - modalHeight - 20;
+      }
+
+      setPosition({ top, left });
       
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      element.classList.add('ring-4', 'ring-emerald-500', 'ring-offset-4', 'transition-all', 'duration-500', 'rounded-2xl');
+      element.classList.add('ring-4', 'ring-emerald-500', 'ring-offset-4', 'transition-all', 'duration-500', 'rounded-2xl', 'z-[150]', 'relative');
     } else {
-      // Fallback to center if element not found
       setPosition({
         top: window.innerHeight / 2 + window.scrollY - 100,
-        left: window.innerWidth / 2 - 150
+        left: Math.max(20, (window.innerWidth - 350) / 2)
       });
     }
   };
 
   const nextStep = () => {
     const element = document.getElementById(steps[currentStep].target);
-    if (element) element.classList.remove('ring-4', 'ring-emerald-500', 'ring-offset-4');
+    if (element) {
+      element.classList.remove('ring-4', 'ring-emerald-500', 'ring-offset-4', 'z-[150]', 'relative');
+    }
     
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
@@ -94,13 +111,17 @@ export function TourGuide({ userId, onComplete }: { userId: string, onComplete: 
 
   const prevStep = () => {
     const element = document.getElementById(steps[currentStep].target);
-    if (element) element.classList.remove('ring-4', 'ring-emerald-500', 'ring-offset-4');
+    if (element) {
+      element.classList.remove('ring-4', 'ring-emerald-500', 'ring-offset-4', 'z-[150]', 'relative');
+    }
     setCurrentStep(Math.max(0, currentStep - 1));
   };
 
   const handleComplete = async () => {
     const element = document.getElementById(steps[currentStep].target);
-    if (element) element.classList.remove('ring-4', 'ring-emerald-500', 'ring-offset-4');
+    if (element) {
+      element.classList.remove('ring-4', 'ring-emerald-500', 'ring-offset-4', 'z-[150]', 'relative');
+    }
     setIsVisible(false);
     await markTourAsSeenAction(userId);
     onComplete();
@@ -110,55 +131,60 @@ export function TourGuide({ userId, onComplete }: { userId: string, onComplete: 
 
   return (
     <div className="fixed inset-0 z-[200] pointer-events-none">
-      <div className="absolute inset-0 bg-slate-900/20 backdrop-blur-[2px] pointer-events-auto" onClick={handleComplete} />
+      {/* Subtle overlay without blur to maintain dashboard readability */}
+      <div className="absolute inset-0 bg-slate-900/40 pointer-events-auto" onClick={handleComplete} />
       
       <div 
-        className="absolute w-[calc(100%-40px)] md:w-[350px] bg-white rounded-[32px] shadow-2xl p-8 pointer-events-auto animate-in zoom-in slide-in-from-top-4 duration-500 border border-slate-100"
-        style={{ top: position.top, left: position.left }}
+        className="absolute w-[calc(100%-40px)] md:w-[350px] bg-white rounded-[40px] shadow-[0_20px_70px_-15px_rgba(0,0,0,0.3)] p-10 pointer-events-auto animate-in zoom-in slide-in-from-top-10 duration-700 ease-out border border-slate-100"
+        style={{ 
+          top: position.top, 
+          left: position.left,
+          transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)' 
+        }}
       >
-        {/* Connector Arrow */}
-        <div className="absolute -top-3 left-10 w-6 h-6 bg-white rotate-45 border-l border-t border-slate-100" />
-
-        <div className="flex justify-between items-start mb-6">
-          <div className="p-3 bg-slate-50 rounded-2xl">
+        <div className="flex justify-between items-start mb-8">
+          <div className="p-4 bg-emerald-50 rounded-3xl text-emerald-600 shadow-inner">
             {steps[currentStep].icon}
           </div>
-          <button onClick={handleComplete} className="p-2 hover:bg-slate-100 rounded-xl transition-colors">
-            <X className="w-5 h-5 text-slate-400" />
+          <button onClick={handleComplete} className="p-3 hover:bg-slate-50 rounded-2xl transition-colors">
+            <X className="w-6 h-6 text-slate-300" />
           </button>
         </div>
 
-        <h4 className="text-xl font-black text-slate-900 mb-3">{steps[currentStep].title}</h4>
-        <p className="text-slate-500 font-medium text-sm leading-relaxed mb-8">
+        <h4 className="text-2xl font-black text-slate-900 mb-4 tracking-tight leading-tight">{steps[currentStep].title}</h4>
+        <p className="text-slate-500 font-medium text-base leading-relaxed mb-10">
           {steps[currentStep].content}
         </p>
 
         <div className="flex items-center justify-between">
-          <div className="flex gap-1">
+          <div className="flex gap-1.5">
             {steps.map((_, i) => (
-              <div key={i} className={`h-1.5 rounded-full transition-all duration-300 ${i === currentStep ? "w-6 bg-emerald-500" : "w-1.5 bg-slate-200"}`} />
+              <div key={i} className={`h-1.5 rounded-full transition-all duration-500 ${i === currentStep ? "w-8 bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" : "w-1.5 bg-slate-200"}`} />
             ))}
           </div>
           
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             {currentStep > 0 && (
-              <button onClick={prevStep} className="p-3 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition-all">
-                <ArrowLeft className="w-5 h-5" />
+              <button onClick={prevStep} className="p-4 bg-slate-50 text-slate-400 rounded-2xl hover:bg-slate-100 hover:text-slate-600 transition-all">
+                <ArrowLeft className="w-6 h-6" />
               </button>
             )}
             <button 
               onClick={nextStep}
-              className="flex items-center gap-2 bg-slate-900 text-white px-5 py-3 rounded-xl font-black text-sm hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/20"
+              className="group flex items-center gap-2 bg-slate-900 text-white px-7 py-4 rounded-2xl font-black text-base hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20 active:scale-95"
             >
-              {currentStep === steps.length - 1 ? "¡Entendido!" : "Siguiente"}
-              <ArrowRight className="w-4 h-4" />
+              {currentStep === steps.length - 1 ? "¡Listo!" : "Siguiente"}
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
         </div>
 
-        <div className="mt-6 pt-6 border-t border-slate-50 flex justify-between items-center">
-           <button onClick={handleComplete} className="text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors uppercase tracking-widest">Omitir Tutorial</button>
-           <div className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md uppercase tracking-tighter">Paso {currentStep + 1} de {steps.length}</div>
+        <div className="mt-8 pt-8 border-t border-slate-100 flex justify-between items-center">
+           <button onClick={handleComplete} className="text-xs font-black text-slate-300 hover:text-slate-900 transition-colors uppercase tracking-widest">Omitir Tour</button>
+           <div className="flex items-center gap-2">
+              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+              <div className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Guía CanchaSync v1.0</div>
+           </div>
         </div>
       </div>
     </div>
