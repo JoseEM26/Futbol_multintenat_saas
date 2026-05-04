@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Activity, CalendarDays, Settings, Users, LogOut, Menu, HelpCircle } from "lucide-react";
 import { signOut, useSession } from "@/lib/auth-client";
@@ -13,10 +14,10 @@ export function AdminDashboard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const role = session?.user?.role || "TENANT_ADMIN";
 
-  if (isPending) return <div className="h-screen w-full flex items-center justify-center bg-slate-50 text-emerald-600 font-bold">Cargando CanchaSync...</div>;
+  if (isPending) return <div className="h-screen w-full flex items-center justify-center bg-slate-50 text-emerald-600 font-bold animate-pulse">Cargando CanchaSync...</div>;
 
   return (
-    <div className="flex h-screen bg-slate-50 text-slate-900 font-sans selection:bg-emerald-500/30">
+    <div className="flex h-screen bg-slate-50 text-slate-900 font-sans selection:bg-emerald-500/30 overflow-hidden">
       {/* Sidebar */}
       <aside
         className={cn(
@@ -112,7 +113,7 @@ export function AdminDashboard({ children }: { children: React.ReactNode }) {
           </div>
         </header>
         
-        <div className="flex-1 overflow-auto p-8">
+        <div className="flex-1 overflow-auto p-4 md:p-8">
           {children}
         </div>
       </main>
@@ -122,7 +123,7 @@ export function AdminDashboard({ children }: { children: React.ReactNode }) {
 
 function NavItem({ icon, label, isOpen, href = "#", active = false }: { icon: React.ReactNode, label: string, isOpen: boolean, href?: string, active?: boolean }) {
   return (
-    <a
+    <Link
       href={href}
       className={cn(
         "flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition-all duration-200",
@@ -133,6 +134,6 @@ function NavItem({ icon, label, isOpen, href = "#", active = false }: { icon: Re
     >
       <span className={cn("flex-shrink-0 w-5 h-5", active ? "text-white" : "")}>{icon}</span>
       {isOpen && <span>{label}</span>}
-    </a>
+    </Link>
   );
 }
