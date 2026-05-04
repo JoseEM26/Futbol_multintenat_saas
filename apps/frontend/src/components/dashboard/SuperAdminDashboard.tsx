@@ -49,8 +49,8 @@ export function SuperAdminDashboard({ stats }: { stats: any }) {
                 <h3 className="text-xl font-bold text-slate-800">Crecimiento de Ingresos</h3>
                 <span className="text-xs font-black bg-slate-100 text-slate-500 px-3 py-1 rounded-full uppercase">Últimos 6 meses</span>
               </div>
-              <div className="h-80 w-full">
-                <ResponsiveContainer width="100%" height="100%">
+              <div className="h-80 w-full min-h-[320px]">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                   <AreaChart data={data}>
                     <defs>
                       <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
@@ -74,8 +74,8 @@ export function SuperAdminDashboard({ stats }: { stats: any }) {
                 <h3 className="text-xl font-bold text-slate-800">Nuevos Usuarios</h3>
                 <span className="text-xs font-black bg-slate-100 text-slate-500 px-3 py-1 rounded-full uppercase">Mensual</span>
               </div>
-              <div className="h-80 w-full">
-                <ResponsiveContainer width="100%" height="100%">
+              <div className="h-80 w-full min-h-[320px]">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                   <BarChart data={data}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />

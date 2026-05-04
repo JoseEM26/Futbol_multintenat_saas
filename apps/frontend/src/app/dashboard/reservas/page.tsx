@@ -18,7 +18,28 @@ export default async function ReservasPage() {
   const role = session?.data?.user?.role || "TENANT_ADMIN";
   const tenantId = session?.data?.user?.tenantId;
 
-  if (role === "SUPER_ADMIN") redirect("/dashboard");
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  if (role === "SUPER_ADMIN") {
+    const allCanchas = await prisma.cancha.findMany({
+      orderBy: { name: "asc" },
+      include: { tenant: true }
+    });
+    const allReservations = await prisma.reservation.findMany({
+      where: { startTime: { gte: today } },
+      include: { cancha: true },
+      orderBy: { startTime: "asc" }
+    });
+    return (
+      <ReservationCalendar 
+        canchas={allCanchas} 
+        initialReservations={allReservations} 
+        tenantId="SUPER_ADMIN"
+      />
+    );
+  }
+
   if (!tenantId) redirect("/dashboard");
 
   const myCanchas = await prisma.cancha.findMany({
