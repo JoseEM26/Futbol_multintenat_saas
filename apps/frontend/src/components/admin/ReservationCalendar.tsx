@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { 
   Calendar, ChevronLeft, ChevronRight, Plus, X, Clock, 
-  User, Phone, DollarSign, Check, AlertTriangle, Building
+  User, Phone, DollarSign, Check, AlertTriangle, Building, MapPin
 } from "lucide-react";
 import { createReservationAction, updateReservationStatusAction } from "@/app/actions/reservations";
 import { CustomModal } from "@/components/ui/CustomModal";

@@ -15,10 +15,11 @@ export default async function ReservasPage() {
 
   if (!session?.data?.user) redirect("/login");
 
-  const role = session.data.user.role;
-  const tenantId = session.data.user.tenantId;
+  const role = session?.data?.user?.role || "TENANT_ADMIN";
+  const tenantId = session?.data?.user?.tenantId;
 
-  if (role !== "TENANT_ADMIN" || !tenantId) redirect("/dashboard");
+  if (role === "SUPER_ADMIN") redirect("/dashboard");
+  if (!tenantId) redirect("/dashboard");
 
   const myCanchas = await prisma.cancha.findMany({
     where: { tenantId },
