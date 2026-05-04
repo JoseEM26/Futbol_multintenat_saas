@@ -12,29 +12,38 @@ import {
   ArrowRight
 } from "lucide-react";
 import { CustomModal } from "@/components/ui/CustomModal";
+import { TourGuide } from "@/components/dashboard/TourGuide";
 import Link from "next/link";
 
-export function TenantAdminDashboard({ stats }: { stats: any }) {
+export function TenantAdminDashboard({ stats, user }: { stats: any, user: any }) {
   const [activeTab, setActiveTab] = useState<"DASHBOARD" | "CANCHAS" | "PERFIL">("DASHBOARD");
+  const [showTour, setShowTour] = useState(!user?.hasSeenTour);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
+      {showTour && (
+        <TourGuide 
+          userId={user?.id} 
+          onComplete={() => setShowTour(false)} 
+        />
+      )}
+
       {/* Header and Tabs */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
+        <div id="dashboard-welcome">
           <h1 className="text-4xl font-black text-slate-900 tracking-tight">Panel de Control</h1>
           <p className="text-slate-500 mt-2 font-medium">Gestión integral de {stats.tenantProfile?.name || "tu complejo"}.</p>
         </div>
         <div className="flex bg-slate-100 p-1.5 rounded-2xl shadow-inner">
           <button onClick={() => setActiveTab("DASHBOARD")} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === "DASHBOARD" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Resumen</button>
-          <button onClick={() => setActiveTab("CANCHAS")} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === "CANCHAS" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Mis Canchas</button>
-          <button onClick={() => setActiveTab("PERFIL")} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === "PERFIL" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Configuración</button>
+          <button id="dashboard-canchas-tab" onClick={() => setActiveTab("CANCHAS")} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === "CANCHAS" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Mis Canchas</button>
+          <button id="dashboard-config-tab" onClick={() => setActiveTab("PERFIL")} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === "PERFIL" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Configuración</button>
         </div>
       </div>
 
       {activeTab === "DASHBOARD" && (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div id="dashboard-stats" className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-slate-900 p-8 rounded-3xl text-white shadow-2xl relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
                 <DollarSign className="w-24 h-24" />
@@ -63,7 +72,7 @@ export function TenantAdminDashboard({ stats }: { stats: any }) {
             </div>
           </div>
 
-          <div className="bg-white p-8 rounded-[40px] border border-slate-100 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+          <div id="dashboard-public-link" className="bg-white p-8 rounded-[40px] border border-slate-100 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
              <div className="flex items-center gap-4">
                 <div className="w-16 h-16 bg-emerald-50 rounded-3xl flex items-center justify-center text-emerald-600 shadow-inner">
                    <Globe className="w-8 h-8" />

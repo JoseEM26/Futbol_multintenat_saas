@@ -120,3 +120,15 @@ export async function toggleUserAndTenantStatusAction(userId: string, tenantId: 
     return { success: false, error: error.message };
   }
 }
+
+export async function markTourAsSeenAction(userId: string) {
+  try {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { hasSeenTour: true }
+    });
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}

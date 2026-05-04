@@ -88,7 +88,7 @@ export default async function DashboardPage() {
   return (
     <>
       {role === "SUPER_ADMIN" && <SuperAdminDashboard stats={stats} />}
-      {role === "TENANT_ADMIN" && <TenantAdminDashboard stats={stats} />}
+      {role === "TENANT_ADMIN" && <TenantAdminDashboard stats={stats} user={session?.data?.user} />}
     </>
   );
 }
