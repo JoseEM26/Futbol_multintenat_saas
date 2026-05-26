@@ -89,6 +89,25 @@ CanchaFutbolSaas/
 
 ---
 
+## 🎓 Curso: Experiencia Formativa V - Proyecto Final
+
+Este repositorio alberga el proyecto de desarrollo de software para el curso **Experiencia Formativa V**.
+
+### 👥 Integrantes:
+* 👤 **Juan**
+* 👤 **Jose**
+* 👤 **Miguel**
+
+### 🗓️ Estado de Entregables del Proyecto:
+* **[x] Entrega 1 – 31/05 (Capítulo 1):** Completado e implementado en el informe oficial.
+* **[ ] Entrega 2 – 14/06 (Capítulo 2):** Planificado.
+* **[ ] Entrega 3 – 28/06 (Capítulo 3):** Planificado.
+
+El documento formal de avances del proyecto se encuentra en la siguiente ruta:
+👉 [Informe_Proyecto_EF5.docx](file:///C:/GITHUB/CanchaFutbolSaas/Entregables/Informe_Proyecto_EF5.docx)
+
+---
+
 ## 🤝 Contact
 
 **José Ángel Espinoza**
