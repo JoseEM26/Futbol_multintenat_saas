@@ -8,51 +8,17 @@ import {
 import { 
   Calendar, TrendingUp, DollarSign, Clock, Users, MapPin, 
   Image as ImageIcon, Settings, Save, CheckCircle2, X, Plus, Loader2,
-  AlertTriangle, Phone, User as UserIcon, Building, Info, Globe, HelpCircle,
+  AlertTriangle, Phone, User as UserIcon, Building, Info, Globe,
   ArrowRight, Download, Trash2, Coffee, Gift, Percent, Award, Sparkles
 } from "lucide-react";
 import { CustomModal } from "@/components/ui/CustomModal";
-import { TourGuide } from "@/components/dashboard/TourGuide";
-import { dashboardTourSteps, canchasTourSteps, perfilTourSteps } from "@/components/dashboard/tourSteps";
 import Link from "next/link";
 
 export function TenantAdminDashboard({ stats, user }: { stats: any, user: any }) {
   const [activeTab, setActiveTab] = useState<"DASHBOARD" | "CANCHAS" | "PERFIL" | "PERSONALIZAR">("DASHBOARD");
-  const [showTour, setShowTour] = useState(!user?.hasSeenTour);
-  const [activeTourModule, setActiveTourModule] = useState<"DASHBOARD" | "CANCHAS" | "PERFIL" | "PERSONALIZAR">("DASHBOARD");
-
-  // Skip auto tour on mobile
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.innerWidth < 768) {
-      setShowTour(false);
-    }
-  }, []);
-
-  // Listen for "Ver Tutorial" button in sidebar
-  useEffect(() => {
-    const handler = () => {
-      if (typeof window !== "undefined" && window.innerWidth < 768) return; // omit on mobile
-      setActiveTourModule(activeTab);
-      setShowTour(true);
-    };
-    window.addEventListener('replay-tour', handler);
-    return () => window.removeEventListener('replay-tour', handler);
-  }, [activeTab]);
-
-  const currentTourSteps = activeTourModule === "CANCHAS" ? canchasTourSteps 
-    : activeTourModule === "PERFIL" ? perfilTourSteps 
-    : dashboardTourSteps;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
-      {showTour && (
-        <TourGuide 
-          steps={currentTourSteps}
-          userId={user?.id}
-          persist={activeTourModule === "DASHBOARD"}
-          onComplete={() => setShowTour(false)} 
-        />
-      )}
 
 
       {/* Header and Tabs */}
@@ -121,18 +87,11 @@ export function TenantAdminDashboard({ stats, user }: { stats: any, user: any })
       )}
 
       {activeTab === "CANCHAS" && (
-        <div>
-          <div className="flex justify-end mb-4">
-            <button onClick={() => { setActiveTourModule('CANCHAS'); setShowTour(true); }} className="flex items-center gap-2 text-sm font-bold text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 px-4 py-2 rounded-xl border border-dashed border-amber-200 transition-all">
-              <HelpCircle className="w-4 h-4" /> Ver Tutorial de Canchas
-            </button>
-          </div>
-          <CanchasManager 
-            canchas={stats.myCanchas || []} 
-            tenantId={stats.tenantProfile?.id} 
-            planLimit={stats.tenantProfile?.plan?.maxCanchas || 1}
-          />
-        </div>
+        <CanchasManager 
+          canchas={stats.myCanchas || []} 
+          tenantId={stats.tenantProfile?.id} 
+          planLimit={stats.tenantProfile?.plan?.maxCanchas || 1}
+        />
       )}
 
       {activeTab === "PERFIL" && (

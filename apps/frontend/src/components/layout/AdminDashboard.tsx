@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Activity, CalendarDays, Settings, Users, LogOut, Menu, HelpCircle, Sparkles } from "lucide-react";
+import { Activity, CalendarDays, Settings, Users, LogOut, Menu, Sparkles } from "lucide-react";
 import { signOut, useSession } from "@/lib/auth-client";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -73,16 +73,6 @@ export function AdminDashboard({ children }: { children: React.ReactNode }) {
               <NavItem icon={<Sparkles />} label="Personalizar Web" isOpen={isSidebarOpen} active={pathname.startsWith("/dashboard/personalizar")} href="/dashboard/personalizar" />
               <NavItem icon={<Settings />} label="Mi Perfil" isOpen={isSidebarOpen} active={pathname.startsWith("/dashboard/perfil")} href="/dashboard/perfil" />
             </>
-          )}
-
-          {role === "TENANT_ADMIN" && (
-            <button
-              onClick={() => window.dispatchEvent(new CustomEvent('replay-tour'))}
-              className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-amber-600 hover:bg-amber-50 transition-colors w-full mt-4 border border-dashed border-amber-200"
-            >
-              <HelpCircle className="w-5 h-5 flex-shrink-0" />
-              {isSidebarOpen && <span>Ver Tutorial</span>}
-            </button>
           )}
 
 
