@@ -755,16 +755,137 @@ export function TenantCustomizer({ profile }: { profile: any }) {
 
   const downloadQR = async () => {
     try {
-      const response = await fetch(qrUrl);
-      const blob = await response.blob();
+      // Create a canvas element
+      const canvas = document.createElement("canvas");
+      canvas.width = 800;
+      canvas.height = 1100;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("Could not get canvas context");
+
+      // 1. Background Gradient (Sleek dark sports gradient)
+      const grad = ctx.createLinearGradient(0, 0, 0, 1100);
+      grad.addColorStop(0, "#0f172a"); // slate-900
+      grad.addColorStop(0.5, "#022c22"); // dark emerald
+      grad.addColorStop(1, "#090d16"); // near black
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 800, 1100);
+
+      // 2. Decorative elements (Sports lines / Pitch overlay)
+      ctx.strokeStyle = "rgba(16, 185, 129, 0.12)"; // emerald-500 with opacity
+      ctx.lineWidth = 6;
+      
+      // Diagonal pitch lines
+      ctx.beginPath();
+      ctx.moveTo(-100, 300);
+      ctx.lineTo(900, 1300);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(-100, 500);
+      ctx.lineTo(900, 1500);
+      ctx.stroke();
+
+      // Pitch circles
+      ctx.beginPath();
+      ctx.arc(800, 0, 250, 0, 2 * Math.PI);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(0, 1100, 350, 0, 2 * Math.PI);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(400, 550, 150, 0, 2 * Math.PI);
+      ctx.stroke();
+
+      // 3. Header text
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      // Tenant Name
+      ctx.fillStyle = "#10b981"; // neon green
+      ctx.font = "bold 26px sans-serif";
+      ctx.fillText(profile.name.toUpperCase(), 400, 100);
+
+      // Main Slogan (Big, bold, athletic typography)
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 56px sans-serif";
+      ctx.fillText("ESCANEA", 400, 185);
+      ctx.fillText("Y RESERVA TU CANCHA", 400, 260);
+
+      // Subtitle
+      ctx.fillStyle = "#94a3b8"; // slate-400
+      ctx.font = "bold 20px sans-serif";
+      ctx.fillText("¡RÁPIDO, FÁCIL Y 100% GARANTIZADO!", 400, 330);
+
+      // 4. White Card for QR Code with border & shadow
+      const cardX = 180;
+      const cardY = 380;
+      const cardW = 440;
+      const cardH = 440;
+      const radius = 48;
+
+      // Card Background
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.roundRect(cardX, cardY, cardW, cardH, radius);
+      ctx.fill();
+
+      // Load QR Image
+      const qrImg = new Image();
+      qrImg.crossOrigin = "anonymous";
+      qrImg.src = qrUrl;
+
+      await new Promise((resolve, reject) => {
+        qrImg.onload = resolve;
+        qrImg.onerror = reject;
+      });
+
+      // Draw QR Image inside the card (adding safety margin)
+      ctx.drawImage(qrImg, cardX + 40, cardY + 40, cardW - 80, cardH - 80);
+
+      // Draw QR card border
+      ctx.strokeStyle = "#10b981";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.roundRect(cardX, cardY, cardW, cardH, radius);
+      ctx.stroke();
+
+      // 5. Footer instruction
+      ctx.fillStyle = "#10b981";
+      ctx.font = "bold 24px sans-serif";
+      ctx.fillText("ESCANEA CON LA CÁMARA DE TU CELULAR", 400, 900);
+
+      // Web link (clean and highlighted)
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 36px sans-serif";
+      ctx.fillText(publicUrl.replace("http://", "").replace("https://", ""), 400, 960);
+
+      // Brand Logo CanchaSync
+      ctx.fillStyle = "#475569"; // slate-600
+      ctx.font = "bold 16px sans-serif";
+      ctx.fillText("POTENCIADO POR CANCHASYNC.PRO", 400, 1030);
+
+      // Trigger download
+      const dataUrl = canvas.toDataURL("image/png");
       const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = `QR-${profile.name.replace(/\s+/g, "-")}.png`;
+      link.href = dataUrl;
+      link.download = `Flyer-QR-${profile.name.replace(/\s+/g, "-")}.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } catch (err) {
-      alert("No se pudo descargar el QR directamente. Haz clic derecho en la imagen y selecciona 'Guardar imagen'.");
+      console.error("Flyer QR generation failed, falling back to direct download...", err);
+      // Fallback: download raw QR image
+      try {
+        const response = await fetch(qrUrl);
+        const blob = await response.blob();
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `QR-${profile.name.replace(/\s+/g, "-")}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (fallbackErr) {
+        alert("No se pudo descargar el QR. Haz clic derecho en el QR de la pantalla y guárdalo.");
+      }
     }
   };
 
