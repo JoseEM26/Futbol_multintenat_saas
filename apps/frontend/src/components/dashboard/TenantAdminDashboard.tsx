@@ -69,7 +69,7 @@ export function TenantAdminDashboard({ stats, user }: { stats: any, user: any })
                 <DollarSign className="w-20 h-20 md:w-24 md:h-24" />
               </div>
               <h4 className="text-slate-400 font-bold text-xs md:text-sm uppercase tracking-wider mb-2">Ingresos del Mes</h4>
-              <div className="text-4xl md:text-5xl font-black mb-4">S/ {stats.monthlyRevenue.toFixed(2)}</div>
+              <div className="text-4xl md:text-5xl font-black mb-4">S/ {(stats.monthlyRevenue || 0).toFixed(2)}</div>
               <div className="flex items-center gap-2 text-[10px] md:text-xs font-black bg-emerald-500/20 text-emerald-400 w-fit px-3 py-1 rounded-full border border-emerald-500/20">
                 <TrendingUp className="w-3 h-3" /> DATOS REALES
               </div>
