@@ -3,12 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "workspaces": [
-    "apps/*",
-    "packages/*"
+    "apps/*"
   ],
   "scripts": {
-    "dev": "npm run db:push -w @cancha/database && npm run dev -w @cancha/frontend",
-    "build": "npm run build --workspaces"
+    "dev": "npm run dev -w @cancha/frontend",
+    "build": "npm run build -w @cancha/frontend"
   },
   "devDependencies": {
     "typescript": "^5.0.0"
@@ -17,4 +16,3 @@
     "better-auth": "^1.6.9"
   }
 }
-

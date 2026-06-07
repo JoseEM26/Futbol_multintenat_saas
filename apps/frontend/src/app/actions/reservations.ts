@@ -1,6 +1,6 @@
 "use server";
 
-import { prisma } from "@cancha/database";
+import { prisma } from "@/lib/db";
 import { ReservationStatus } from "@prisma/client";
 
 export async function createReservationAction(data: {

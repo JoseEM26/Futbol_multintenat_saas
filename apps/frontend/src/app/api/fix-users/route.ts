@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@cancha/database';
+import { prisma } from "@/lib/db";
 import { auth } from '@/lib/auth';
 
 export async function GET() {

@@ -1,6 +1,6 @@
 "use server";
 
-import { prisma } from "@cancha/database";
+import { prisma } from "@/lib/db";
 
 export async function createPlanAction(data: any) {
   try {

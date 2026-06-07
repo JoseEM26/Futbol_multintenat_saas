@@ -1,6 +1,6 @@
 "use server";
 
-import { prisma } from "@cancha/database";
+import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";

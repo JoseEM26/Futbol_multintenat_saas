@@ -1,4 +1,4 @@
-import { prisma } from "@cancha/database";
+import { prisma } from "@/lib/db";
 import { authClient } from "@/lib/auth-client";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";

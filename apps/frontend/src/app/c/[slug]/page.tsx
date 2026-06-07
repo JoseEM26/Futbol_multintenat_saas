@@ -1,4 +1,4 @@
-import { prisma } from "@cancha/database";
+import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";

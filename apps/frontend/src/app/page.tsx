@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { prisma } from "@cancha/database";
+import { prisma } from "@/lib/db";
 import { CalendarCheck, Shield, Zap, Trophy, MapPin, Star, Check, Phone, Mail, User, Building, ArrowRight, ShieldCheck } from "lucide-react";
 import { TenantRegistrationForm } from "@/components/landing/TenantRegistrationForm";
 

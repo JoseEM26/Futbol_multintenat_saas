@@ -1,6 +1,6 @@
 import { authClient } from "@/lib/auth-client";
 import { headers } from "next/headers";
-import { prisma } from "@cancha/database";
+import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { TenantCustomizer } from "@/components/dashboard/TenantAdminDashboard";
 
