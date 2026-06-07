@@ -29,6 +29,8 @@ model Tenant {
   sponsorships  String?  @db.Text // JSON string of sponsor ads & academies
   bgImage       String?  @db.Text // Base64 or preset key for landing background
   
+  contactEmail   String?   // Email de contacto del negocio (no es el login)
+
   // Subscription fields
   planId         String?   @default("trial")
   plan           Plan?     @relation(fields: [planId], references: [id])
@@ -53,6 +55,7 @@ model User {
   accounts      Account[]
 
   // Custom Fields
+  dni           String?   @unique // DNI del administrador (identificador de login)
   tenantId      String?
   tenant        Tenant?   @relation(fields: [tenantId], references: [id])
   role          Role      @default(TENANT_ADMIN)

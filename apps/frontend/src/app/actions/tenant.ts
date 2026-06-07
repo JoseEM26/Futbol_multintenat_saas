@@ -6,29 +6,36 @@ import { headers } from "next/headers";
 
 export async function registerTenantAction(formData: FormData) {
   const name = formData.get("name") as string;
-  const email = formData.get("email") as string;
+  const dni = (formData.get("dni") as string)?.trim();
+  const contactEmail = (formData.get("contactEmail") as string)?.trim();
   const password = formData.get("password") as string;
   const tenantName = formData.get("tenantName") as string;
 
-  if (!name || !email || !password || !tenantName) {
+  if (!name || !dni || !password || !tenantName) {
     return { error: "Todos los campos son obligatorios" };
   }
 
+  if (!/^\d{8}$/.test(dni)) {
+    return { error: "El DNI debe tener exactamente 8 dígitos numéricos" };
+  }
+
+  if (contactEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail)) {
+    return { error: "El correo de contacto no tiene un formato válido" };
+  }
+
+  // Email interno de BetterAuth — nunca se muestra al usuario
+  const internalEmail = `${dni}@canchasync.app`;
+
   try {
-    // 1. Check if tenant name exists (early exit)
     const existingTenant = await prisma.tenant.findUnique({ where: { name: tenantName } });
     if (existingTenant) return { error: "El nombre de este complejo ya existe. Elige otro nombre único." };
 
-    // 2. Format DNI as email if purely numeric
-    let formattedEmail = email.trim();
-    if (/^\d+$/.test(formattedEmail)) {
-      formattedEmail = `${formattedEmail}@canchapro.local`;
-    }
+    const existingUser = await prisma.user.findFirst({ where: { dni } });
+    if (existingUser) return { error: "Este DNI ya está registrado en el sistema." };
 
-    // 3. Use BetterAuth API to create user (handles hashing correctly)
     const result = await auth.api.signUpEmail({
       body: {
-        email: formattedEmail,
+        email: internalEmail,
         password,
         name,
       },
@@ -41,21 +48,21 @@ export async function registerTenantAction(formData: FormData) {
 
     const userId = result.user.id;
 
-    // 3. Create Tenant
     const tenant = await prisma.tenant.create({
       data: {
         name: tenantName,
+        contactEmail: contactEmail || null,
         planId: "trial",
-        planExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+        planExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       }
     });
 
-    // 4. Update User with tenantId
     await prisma.user.update({
       where: { id: userId },
       data: {
         tenantId: tenant.id,
         role: "TENANT_ADMIN",
+        dni,
       }
     });
 
@@ -63,7 +70,7 @@ export async function registerTenantAction(formData: FormData) {
   } catch (error: any) {
     console.error("Error registering tenant:", error);
     if (error.message?.includes("already exists")) {
-      return { error: "El correo ya está registrado" };
+      return { error: "Este DNI ya está registrado." };
     }
     return { error: error.message || "Error interno al procesar el registro" };
   }
