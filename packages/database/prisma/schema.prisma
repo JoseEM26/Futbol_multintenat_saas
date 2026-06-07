@@ -22,6 +22,12 @@ model Tenant {
   managerName String?
   canchas   Cancha[]
   users     User[]
+
+  // Customizations
+  beverages     String?  @db.Text // JSON string of beverages & snacks
+  promotions    String?  @db.Text // JSON string of rental discounts & promos
+  sponsorships  String?  @db.Text // JSON string of sponsor ads & academies
+  bgImage       String?  @db.Text // Base64 or preset key for landing background
   
   // Subscription fields
   planId         String?   @default("trial")
@@ -51,6 +57,7 @@ model User {
   tenant        Tenant?   @relation(fields: [tenantId], references: [id])
   role          Role      @default(TENANT_ADMIN)
   hasSeenTour   Boolean   @default(false)
+  isActive      Boolean   @default(true)
   reservations  Reservation[]
 
   @@map("user")

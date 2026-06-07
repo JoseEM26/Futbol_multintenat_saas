@@ -15,21 +15,39 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
 
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("error") === "inactive") {
+        setErrorModal({
+          isOpen: true,
+          title: "Cuenta Inhabilitada",
+          message: "Tu cuenta ha sido inhabilitada temporalmente por el administrador. Ponte en contacto con soporte si crees que esto es un error."
+        });
+      }
+    }
+  }, []);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
       setErrorModal({
         isOpen: true,
         title: "Campos Incompletos",
-        message: "Por favor, ingresa tu correo electrónico y contraseña para continuar."
+        message: "Por favor, ingresa tu DNI o correo electrónico y contraseña para continuar."
       });
       return;
     }
 
     setLoading(true);
     try {
+      let loginEmail = email.trim();
+      if (/^\d+$/.test(loginEmail)) {
+        loginEmail = `${loginEmail}@canchapro.local`;
+      }
+
       const { data, error } = await authClient.signIn.email({
-        email,
+        email: loginEmail,
         password,
         callbackURL: "/dashboard",
       });
@@ -38,7 +56,7 @@ export default function LoginPage() {
         setErrorModal({
           isOpen: true,
           title: "Acceso Denegado",
-          message: error.message || "El correo o la contraseña no coinciden con nuestros registros."
+          message: error.message || "El DNI/correo o la contraseña no coinciden con nuestros registros."
         });
       } else {
         router.push("/dashboard");
@@ -92,17 +110,17 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-1">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-4 mb-2 block">
-                Correo Electrónico
+                DNI o Correo Electrónico
               </label>
               <div className="relative group">
                 <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-emerald-500 transition-colors">
                   <Mail className="w-5 h-5" />
                 </div>
                 <input 
-                  type="email" 
+                  type="text" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="ejemplo@canchapro.com"
+                  placeholder="Ej. 71234567 o tu@correo.com"
                   className="w-full bg-slate-50 border-2 border-slate-100 p-5 pl-14 rounded-[24px] focus:outline-none focus:border-emerald-500/50 focus:bg-white transition-all font-bold text-slate-900"
                   disabled={loading}
                 />

@@ -13,7 +13,7 @@ export default async function PlanesPage() {
     }
   });
 
-  if (!session?.data?.user || session.data.user.role !== "SUPER_ADMIN") {
+  if (!session?.data?.user || (session.data.user as any).role !== "SUPER_ADMIN") {
     redirect("/dashboard");
   }
 

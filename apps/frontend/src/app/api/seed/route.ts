@@ -11,9 +11,34 @@ export async function GET() {
     await prisma.tenant.deleteMany({});
     await prisma.user.deleteMany({});
 
+    const defaultBeverages = [
+      { id: "1", name: "Gatorade Blue", price: 6.5, icon: "⚡", image: "/defaults/gatorade.png", active: true, description: "Bebida rehidratante de 500ml." },
+      { id: "2", name: "Sporade Mandarina", price: 5.0, icon: "⚡", image: "/defaults/sporade.png", active: true, description: "Bebida isotónica sabor mandarina." },
+      { id: "3", name: "Energizante Bolt", price: 4.0, icon: "⚡", image: "/defaults/bolt.png", active: true, description: "Bebida energizante de 250ml." },
+      { id: "4", name: "Papas Lay's Clásicas", price: 4.0, icon: "🍿", image: "/defaults/lays.png", active: true, description: "Snack de papas clásicas." },
+      { id: "5", name: "Coca-Cola Original", price: 4.5, icon: "🥤", image: "/defaults/cocacola.png", active: true, description: "Gaseosa helada de 500ml." }
+    ];
+
+    const defaultPromotions = [
+      { id: "1", title: "Lunes de Fichaje", description: "Alquila cualquier cancha los días lunes y recibe un 20% de descuento automático en tu reserva.", discount: "20% OFF" },
+      { id: "2", title: "Hora Extra Nocturna", description: "Juega a partir de las 10 PM y tu segunda hora tiene 30% de descuento.", discount: "30% OFF" }
+    ];
+
+    const defaultSponsorships = [
+      { id: "1", title: "Academia Infantil Los Cracks", description: "Entrenamientos para niños de 5 a 12 años. Profesores calificados y metodología europea.", image: "/defaults/kids_academy.png", price: "S/ 150/mes", schedule: "Mar y Jue 4:00 PM" },
+      { id: "2", title: "Patrocinador Oficial - Gatorade", description: "Recupera tu energía con Gatorade oficial en nuestra cantina.", image: "/defaults/sports_drinks.png", price: "Auspiciador", schedule: "Todo el año" }
+    ];
+
     // 1. Create Tenant (El local / tienda principal)
-    const tenant = await prisma.tenant.create({
-      data: { name: 'Súper Canchas El Maracaná', logo: '' }
+    const tenant = await (prisma.tenant as any).create({
+      data: { 
+        name: 'Súper Canchas El Maracaná', 
+        logo: '/logo.png',
+        bgImage: '/defaults/sports_drinks.png',
+        beverages: JSON.stringify(defaultBeverages),
+        promotions: JSON.stringify(defaultPromotions),
+        sponsorships: JSON.stringify(defaultSponsorships)
+      }
     });
 
     // 2. Create Admin User directly
@@ -34,7 +59,7 @@ export async function GET() {
         email: "jugador@canchapro.com",
         name: "Juan Jugador",
         password: "password123456",
-        role: "CUSTOMER",
+        role: "TENANT_ADMIN",
         emailVerified: true
       }
     });

@@ -14,18 +14,22 @@ export default async function UsuariosPage() {
   });
 
   if (!session?.data?.user) redirect("/login");
-  if (session.data.user.role !== "SUPER_ADMIN") redirect("/dashboard");
+  if ((session.data.user as any).role !== "SUPER_ADMIN") redirect("/dashboard");
 
   const users = await prisma.user.findMany({
     include: { tenant: true },
     orderBy: { createdAt: "desc" }
   });
 
+  const tenants = await prisma.tenant.findMany({
+    orderBy: { name: "asc" }
+  });
+
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-black text-slate-900">Gestión de Usuarios</h1>
       <p className="text-slate-500 font-medium">Administra todos los usuarios de CanchaSync.</p>
-      <SuperAdminUsersManager users={users} />
+      <SuperAdminUsersManager users={users} tenants={tenants} currentUser={session?.data?.user} />
     </div>
   );
 }

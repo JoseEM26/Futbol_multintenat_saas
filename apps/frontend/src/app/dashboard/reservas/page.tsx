@@ -15,8 +15,8 @@ export default async function ReservasPage() {
 
   if (!session?.data?.user) redirect("/login");
 
-  const role = session?.data?.user?.role || "TENANT_ADMIN";
-  const tenantId = session?.data?.user?.tenantId;
+  const role = (session?.data?.user as any)?.role || "TENANT_ADMIN";
+  const tenantId = (session?.data?.user as any)?.tenantId;
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);

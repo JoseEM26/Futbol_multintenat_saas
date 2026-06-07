@@ -19,10 +19,16 @@ export async function registerTenantAction(formData: FormData) {
     const existingTenant = await prisma.tenant.findUnique({ where: { name: tenantName } });
     if (existingTenant) return { error: "El nombre de este complejo ya existe. Elige otro nombre único." };
 
-    // 2. Use BetterAuth API to create user (handles hashing correctly)
+    // 2. Format DNI as email if purely numeric
+    let formattedEmail = email.trim();
+    if (/^\d+$/.test(formattedEmail)) {
+      formattedEmail = `${formattedEmail}@canchapro.local`;
+    }
+
+    // 3. Use BetterAuth API to create user (handles hashing correctly)
     const result = await auth.api.signUpEmail({
       body: {
-        email,
+        email: formattedEmail,
         password,
         name,
       },

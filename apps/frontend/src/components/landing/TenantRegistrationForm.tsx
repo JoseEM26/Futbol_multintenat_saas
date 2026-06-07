@@ -64,10 +64,10 @@ export function TenantRegistrationForm() {
           </div>
         </div>
         <div className="space-y-1">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4 mb-2 block">Correo Electrónico</label>
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4 mb-2 block">DNI / Documento de Identidad</label>
           <div className="relative group">
             <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-emerald-500 transition-colors" />
-            <input name="email" type="email" required placeholder="tu@correo.com" className="w-full bg-slate-50 border-2 border-slate-50 p-5 pl-14 rounded-3xl focus:outline-none focus:border-emerald-500/50 focus:bg-white font-bold transition-all disabled:opacity-50" disabled={loading} />
+            <input name="email" type="text" required placeholder="Ej. 71234567 o tu@correo.com" className="w-full bg-slate-50 border-2 border-slate-50 p-5 pl-14 rounded-3xl focus:outline-none focus:border-emerald-500/50 focus:bg-white font-bold transition-all disabled:opacity-50" disabled={loading} />
           </div>
         </div>
         <div className="space-y-1">

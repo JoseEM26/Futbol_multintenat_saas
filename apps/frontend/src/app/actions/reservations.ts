@@ -13,6 +13,33 @@ export async function createReservationAction(data: {
   paymentType: "ADELANTO" | "PALABRA";
 }) {
   try {
+    // Validar cruce de horarios para la misma cancha (excluyendo canceladas)
+    const overlapping = await prisma.reservation.findFirst({
+      where: {
+        canchaId: data.canchaId,
+        status: { not: "CANCELADO" },
+        OR: [
+          {
+            // Caso 1: La reserva existente empieza durante la nueva reserva
+            startTime: { gte: data.startTime, lt: data.endTime }
+          },
+          {
+            // Caso 2: La reserva existente termina durante la nueva reserva
+            endTime: { gt: data.startTime, lte: data.endTime }
+          },
+          {
+            // Caso 3: La reserva existente contiene por completo la nueva reserva
+            startTime: { lte: data.startTime },
+            endTime: { gte: data.endTime }
+          }
+        ]
+      }
+    });
+
+    if (overlapping) {
+      return { success: false, error: "Ya existe una reserva que se cruza con el horario solicitado." };
+    }
+
     const reservation = await prisma.reservation.create({
       data: {
         canchaId: data.canchaId,

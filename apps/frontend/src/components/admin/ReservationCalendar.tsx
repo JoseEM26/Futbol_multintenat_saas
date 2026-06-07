@@ -53,10 +53,14 @@ export function ReservationCalendar({ canchas, initialReservations, tenantId }: 
   const getReservationForSlot = (date: Date, hour: number) => {
     return canchaReservations.find((r: any) => {
       const start = new Date(r.startTime);
-      return start.getFullYear() === date.getFullYear() &&
-             start.getMonth() === date.getMonth() &&
-             start.getDate() === date.getDate() &&
-             start.getHours() === hour;
+      const end = new Date(r.endTime);
+      
+      // Crear la fecha exacta para el slot actual
+      const slotTime = new Date(date);
+      slotTime.setHours(hour, 0, 0, 0);
+      
+      // El slot está reservado si la hora cae dentro del rango de inicio (inclusive) y fin (exclusive)
+      return slotTime.getTime() >= start.getTime() && slotTime.getTime() < end.getTime();
     });
   };
 

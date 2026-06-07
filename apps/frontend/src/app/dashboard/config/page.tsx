@@ -12,7 +12,7 @@ export default async function ConfigPage() {
   });
 
   if (!session?.data?.user) redirect("/login");
-  if (session.data.user.role !== "SUPER_ADMIN") redirect("/dashboard");
+  if ((session.data.user as any).role !== "SUPER_ADMIN") redirect("/dashboard");
 
   return (
     <div className="space-y-8">

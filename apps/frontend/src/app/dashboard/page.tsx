@@ -19,9 +19,9 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  const role = session?.data?.user?.role || "TENANT_ADMIN";
+  const role = (session?.data?.user as any)?.role || "TENANT_ADMIN";
   const userId = session?.data?.user?.id;
-  const tenantId = session?.data?.user?.tenantId;
+  const tenantId = (session?.data?.user as any)?.tenantId;
 
   // Fetch stats based on role
   let stats: any = {};
@@ -87,7 +87,7 @@ export default async function DashboardPage() {
 
   return (
     <>
-      {role === "SUPER_ADMIN" && <SuperAdminDashboard stats={stats} />}
+      {role === "SUPER_ADMIN" && <SuperAdminDashboard stats={stats} user={session?.data?.user} />}
       {role === "TENANT_ADMIN" && <TenantAdminDashboard stats={stats} user={session?.data?.user} />}
     </>
   );

@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Activity, CalendarDays, Settings, Users, LogOut, Menu, HelpCircle } from "lucide-react";
+import { Activity, CalendarDays, Settings, Users, LogOut, Menu, HelpCircle, Sparkles } from "lucide-react";
 import { signOut, useSession } from "@/lib/auth-client";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -12,9 +12,21 @@ export function AdminDashboard({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
   const { data: session, isPending } = useSession();
   const pathname = usePathname();
-  const role = session?.user?.role || "TENANT_ADMIN";
+  const role = (session?.user as any)?.role || "TENANT_ADMIN";
+
+  React.useEffect(() => {
+    if (!isPending && session?.user && (session.user as any).isActive === false) {
+      signOut().then(() => {
+        window.location.href = "/login?error=inactive";
+      });
+    }
+  }, [session, isPending]);
 
   if (isPending) return <div className="h-screen w-full flex items-center justify-center bg-slate-50 text-emerald-600 font-bold animate-pulse">Cargando CanchaSync...</div>;
+
+  if (session?.user && (session.user as any).isActive === false) {
+    return <div className="h-screen w-full flex items-center justify-center bg-slate-50 text-red-600 font-bold animate-pulse">Cuenta inhabilitada. Redirigiendo...</div>;
+  }
 
   return (
     <div className="flex h-screen bg-slate-50 text-slate-900 font-sans selection:bg-emerald-500/30 overflow-hidden">
@@ -58,6 +70,7 @@ export function AdminDashboard({ children }: { children: React.ReactNode }) {
             <>
               <NavItem icon={<Activity />} label="Mis Canchas" isOpen={isSidebarOpen} active={pathname.startsWith("/dashboard/canchas")} href="/dashboard/canchas" />
               <NavItem icon={<CalendarDays />} label="Reservas" isOpen={isSidebarOpen} active={pathname.startsWith("/dashboard/reservas")} href="/dashboard/reservas" />
+              <NavItem icon={<Sparkles />} label="Personalizar Web" isOpen={isSidebarOpen} active={pathname.startsWith("/dashboard/personalizar")} href="/dashboard/personalizar" />
               <NavItem icon={<Settings />} label="Mi Perfil" isOpen={isSidebarOpen} active={pathname.startsWith("/dashboard/perfil")} href="/dashboard/perfil" />
             </>
           )}

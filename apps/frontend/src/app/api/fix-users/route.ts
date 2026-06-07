@@ -45,7 +45,7 @@ export async function GET() {
 
     await prisma.user.update({
       where: { email: "jugador@canchapro.com" },
-      data: { role: "CUSTOMER" }
+      data: { role: "TENANT_ADMIN" }
     });
 
     return NextResponse.json({ message: 'Usuarios arreglados. Contraseñas hasheadas y SuperAdmin creado.' });

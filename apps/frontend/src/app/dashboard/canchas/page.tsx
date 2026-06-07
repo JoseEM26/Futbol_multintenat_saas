@@ -14,8 +14,8 @@ export default async function CanchasPage() {
   });
 
   if (!session?.data?.user) redirect("/login");
-  const role = session.data.user.role;
-  const tenantId = session.data.user.tenantId;
+  const role = (session.data.user as any).role;
+  const tenantId = (session.data.user as any).tenantId;
 
   if (role !== "TENANT_ADMIN" || !tenantId) redirect("/dashboard");
 
