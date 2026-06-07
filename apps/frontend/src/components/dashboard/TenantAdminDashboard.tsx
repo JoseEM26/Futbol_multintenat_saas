@@ -1000,7 +1000,7 @@ export function TenantCustomizer({ profile }: { profile: any }) {
 
           <div className="space-y-2">
             {beverages.map(item => (
-              <div key={item.id} className={`flex items-center justify-between p-4 bg-white rounded-2xl border ${item.active === false ? 'border-dashed border-slate-200 opacity-60' : 'border-slate-100'} shadow-sm hover:border-emerald-200 transition-colors`}>
+              <div key={item.id} className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white rounded-2xl border ${item.active === false ? 'border-dashed border-slate-200 opacity-60' : 'border-slate-100'} shadow-sm hover:border-emerald-200 transition-colors gap-4`}>
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-slate-50 rounded-xl overflow-hidden flex items-center justify-center relative flex-shrink-0 border border-slate-100">
                     {item.image ? (
@@ -1010,7 +1010,7 @@ export function TenantCustomizer({ profile }: { profile: any }) {
                     )}
                   </div>
                   <div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="font-black text-slate-800 text-sm">{item.name}</span>
                       {item.active === false ? (
                         <span className="bg-slate-100 text-slate-500 font-black text-[8px] px-2 py-0.5 rounded uppercase tracking-wider">Inactivo</span>
@@ -1021,7 +1021,7 @@ export function TenantCustomizer({ profile }: { profile: any }) {
                     <div className="text-[10px] text-slate-400 font-medium mt-0.5">{item.description || "Sin descripción"}</div>
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-50">
                   <span className="font-black text-slate-900 text-sm">S/ {Number(item.price).toFixed(2)}</span>
                   <div className="flex items-center gap-2">
                     <button 
@@ -1080,14 +1080,14 @@ export function TenantCustomizer({ profile }: { profile: any }) {
 
           <div className="space-y-2">
             {promotions.map(item => (
-              <div key={item.id} className="flex items-center justify-between p-4 bg-white rounded-2xl border border-slate-100 shadow-sm hover:border-emerald-200 transition-colors">
+              <div key={item.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white rounded-2xl border border-slate-100 shadow-sm hover:border-emerald-200 transition-colors gap-3">
                 <div>
                   <div className="font-black text-slate-800 text-sm">{item.title}</div>
                   <div className="text-[10px] text-slate-500 font-bold mt-0.5">{item.description}</div>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-50">
                   {item.discount && <span className="bg-blue-50 text-blue-600 border border-blue-100 px-3 py-1 rounded-lg text-xs font-black">{item.discount}</span>}
-                  <button type="button" onClick={() => handleRemovePromo(item.id)} className="p-1 text-slate-400 hover:text-red-500 transition-colors">
+                  <button type="button" onClick={() => handleRemovePromo(item.id)} className="p-1 text-slate-400 hover:text-red-500 transition-colors ml-auto sm:ml-0">
                     <X className="w-4 h-4" />
                   </button>
                 </div>
