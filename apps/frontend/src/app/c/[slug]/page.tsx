@@ -6,6 +6,7 @@ import {
   MapPin, Clock, Phone, DollarSign, User, ShieldCheck, 
   Calendar, Info, Trophy, Star, ArrowLeft, Coffee, Gift, Percent, Award, Sparkles 
 } from "lucide-react";
+import InteractiveCalendar from "@/components/cancha/InteractiveCalendar";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,11 @@ export default async function TenantPublicPage({ params }: { params: { slug: str
       ]
     },
     include: {
-      canchas: true,
+      canchas: {
+        include: {
+          openingHours: true
+        }
+      },
     }
   });
 
@@ -139,28 +144,63 @@ export default async function TenantPublicPage({ params }: { params: { slug: str
               <p className="text-lg text-slate-600 leading-relaxed font-medium">
                  {tenant.description || "Bienvenidos a nuestro complejo deportivo. Ofrecemos las mejores canchas de la zona con iluminación profesional y césped de alta calidad. ¡Reserva tu hora y ven a jugar!"}
               </p>
-           </div>
-
-           {/* Nuestras Canchas */}
-           <div className="space-y-8">
-              <h2 className="text-3xl font-black text-slate-900 tracking-tight">Nuestras Canchas</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                 {tenant.canchas.map(cancha => (
-                   <div key={cancha.id} className="bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-hidden group hover:shadow-xl transition-all">
-                      <div className="aspect-video bg-slate-100 relative overflow-hidden">
-                         {cancha.image ? <img src={cancha.image} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><Calendar className="w-12 h-12 text-slate-200" /></div>}
-                         <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-xl font-black text-emerald-600 shadow-sm">S/ {Number(cancha.pricePerHour).toFixed(0)}</div>
+              
+              {tenant.canchas.length === 1 ? (
+                <div className="space-y-6 pt-6">
+                  <div className="bg-white p-8 rounded-[40px] border border-slate-100 shadow-sm space-y-4">
+                    <div className="flex justify-between items-start flex-wrap gap-4">
+                      <div>
+                        <span className="bg-emerald-100 text-emerald-800 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider">
+                          Cancha disponible
+                        </span>
+                        <h2 className="text-3xl font-black text-slate-900 tracking-tight mt-2">{tenant.canchas[0].name}</h2>
                       </div>
-                      <div className="p-8">
-                         <h3 className="text-2xl font-black text-slate-900 mb-2">{cancha.name}</h3>
-                         <p className="text-slate-500 font-medium text-sm mb-6 line-clamp-2">{cancha.description}</p>
-                         <Link href={`/cancha/${cancha.id}`} className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black hover:bg-slate-800 transition-all active:scale-[0.98] block text-center">
-                            Reservar ahora
-                         </Link>
+                      <div className="bg-emerald-600 text-white font-black px-5 py-2 rounded-2xl shadow-md text-lg">
+                        S/ {Number(tenant.canchas[0].pricePerHour).toFixed(0)} / hora
                       </div>
+                    </div>
+                    {tenant.canchas[0].description && (
+                      <p className="text-slate-500 font-medium leading-relaxed">{tenant.canchas[0].description}</p>
+                    )}
+                  </div>
+                  
+                  <div className="bg-white p-6 md:p-8 rounded-[40px] border border-slate-100 shadow-sm">
+                    <h3 className="text-2xl font-black text-slate-900 tracking-tight mb-6 flex items-center gap-2">
+                      <Calendar className="w-6 h-6 text-emerald-600" /> Reserva tu Horario de Juego
+                    </h3>
+                    <InteractiveCalendar 
+                      canchaId={tenant.canchas[0].id} 
+                      pricePerHour={tenant.canchas[0].pricePerHour} 
+                      openingHours={(tenant.canchas[0] as any).openingHours}
+                    />
+                  </div>
+                </div>
+              ) : tenant.canchas.length > 1 ? (
+                <div className="space-y-8 pt-6">
+                   <h2 className="text-3xl font-black text-slate-900 tracking-tight">Nuestras Canchas</h2>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {tenant.canchas.map(cancha => (
+                        <div key={cancha.id} className="bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-hidden group hover:shadow-xl transition-all">
+                           <div className="aspect-video bg-slate-100 relative overflow-hidden">
+                              {cancha.image ? <img src={cancha.image} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><Calendar className="w-12 h-12 text-slate-200" /></div>}
+                              <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-xl font-black text-emerald-600 shadow-sm">S/ {Number(cancha.pricePerHour).toFixed(0)}</div>
+                           </div>
+                           <div className="p-8">
+                              <h3 className="text-2xl font-black text-slate-900 mb-2">{cancha.name}</h3>
+                              <p className="text-slate-500 font-medium text-sm mb-6 line-clamp-2">{cancha.description}</p>
+                              <Link href={`/cancha/${cancha.id}`} className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black hover:bg-slate-800 transition-all active:scale-[0.98] block text-center">
+                                 Reservar ahora
+                              </Link>
+                           </div>
+                        </div>
+                      ))}
                    </div>
-                 ))}
-              </div>
+                </div>
+              ) : (
+                <div className="bg-white p-8 rounded-[40px] border border-slate-150 text-center text-slate-400 font-bold mt-6">
+                   No hay canchas registradas por el momento.
+                </div>
+              )}
            </div>
 
            {/* Cafetería / Pikeos / Bebidas */}
