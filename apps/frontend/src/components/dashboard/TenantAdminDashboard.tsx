@@ -50,61 +50,61 @@ export function TenantAdminDashboard({ stats, user }: { stats: any, user: any })
       {/* Header and Tabs */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div id="dashboard-welcome">
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">Panel de Control</h1>
-          <p className="text-slate-500 mt-2 font-medium">Gestión integral de {stats.tenantProfile?.name || "tu complejo"}.</p>
+          <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Panel de Control</h1>
+          <p className="text-slate-500 mt-1 md:mt-2 text-sm md:text-base font-medium">Gestión integral de {stats.tenantProfile?.name || "tu complejo"}.</p>
         </div>
-        <div className="flex bg-slate-100 p-1.5 rounded-2xl shadow-inner">
-          <button onClick={() => setActiveTab("DASHBOARD")} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === "DASHBOARD" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Resumen</button>
-          <button id="dashboard-canchas-tab" onClick={() => setActiveTab("CANCHAS")} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === "CANCHAS" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Mis Canchas</button>
-          <button id="dashboard-config-tab" onClick={() => setActiveTab("PERFIL")} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === "PERFIL" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Configuración</button>
-          <button onClick={() => setActiveTab("PERSONALIZAR")} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === "PERSONALIZAR" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Personalizar Web</button>
+        <div className="flex overflow-x-auto no-scrollbar bg-slate-100 p-1.5 rounded-2xl shadow-inner max-w-full whitespace-nowrap scrollbar-none">
+          <button onClick={() => setActiveTab("DASHBOARD")} className={`px-4 md:px-6 py-2.5 rounded-xl font-bold text-xs md:text-sm transition-all flex-shrink-0 ${activeTab === "DASHBOARD" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Resumen</button>
+          <button id="dashboard-canchas-tab" onClick={() => setActiveTab("CANCHAS")} className={`px-4 md:px-6 py-2.5 rounded-xl font-bold text-xs md:text-sm transition-all flex-shrink-0 ${activeTab === "CANCHAS" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Mis Canchas</button>
+          <button id="dashboard-config-tab" onClick={() => setActiveTab("PERFIL")} className={`px-4 md:px-6 py-2.5 rounded-xl font-bold text-xs md:text-sm transition-all flex-shrink-0 ${activeTab === "PERFIL" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Configuración</button>
+          <button onClick={() => setActiveTab("PERSONALIZAR")} className={`px-4 md:px-6 py-2.5 rounded-xl font-bold text-xs md:text-sm transition-all flex-shrink-0 ${activeTab === "PERSONALIZAR" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Personalizar Web</button>
         </div>
       </div>
 
       {activeTab === "DASHBOARD" && (
         <>
           <div id="dashboard-stats" className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-slate-900 p-8 rounded-3xl text-white shadow-2xl relative overflow-hidden group">
+            <div className="bg-slate-900 p-6 md:p-8 rounded-3xl text-white shadow-2xl relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
-                <DollarSign className="w-24 h-24" />
+                <DollarSign className="w-20 h-20 md:w-24 md:h-24" />
               </div>
-              <h4 className="text-slate-400 font-bold text-sm uppercase tracking-wider mb-2">Ingresos del Mes</h4>
-              <div className="text-5xl font-black mb-4">S/ {stats.monthlyRevenue.toFixed(2)}</div>
-              <div className="flex items-center gap-2 text-xs font-black bg-emerald-500/20 text-emerald-400 w-fit px-3 py-1 rounded-full border border-emerald-500/20">
+              <h4 className="text-slate-400 font-bold text-xs md:text-sm uppercase tracking-wider mb-2">Ingresos del Mes</h4>
+              <div className="text-4xl md:text-5xl font-black mb-4">S/ {stats.monthlyRevenue.toFixed(2)}</div>
+              <div className="flex items-center gap-2 text-[10px] md:text-xs font-black bg-emerald-500/20 text-emerald-400 w-fit px-3 py-1 rounded-full border border-emerald-500/20">
                 <TrendingUp className="w-3 h-3" /> DATOS REALES
               </div>
             </div>
 
-            <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm hover:border-emerald-500/30 transition-colors group">
-              <h4 className="text-slate-500 font-bold text-sm uppercase tracking-wider mb-2">Reservas Hoy</h4>
-              <div className="text-5xl font-black text-slate-900 mb-4">{stats.todayReservations}</div>
-              <div className="flex items-center gap-2 text-xs font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full w-fit">
+            <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm hover:border-emerald-500/30 transition-colors group">
+              <h4 className="text-slate-500 font-bold text-xs md:text-sm uppercase tracking-wider mb-2">Reservas Hoy</h4>
+              <div className="text-4xl md:text-5xl font-black text-slate-900 mb-4">{stats.todayReservations}</div>
+              <div className="flex items-center gap-2 text-[10px] md:text-xs font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full w-fit">
                 <Calendar className="w-3 h-3" /> Ver Agenda
               </div>
             </div>
 
-            <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm hover:border-blue-500/30 transition-colors group">
-              <h4 className="text-slate-500 font-bold text-sm uppercase tracking-wider mb-2">Capacidad Utilizada</h4>
-              <div className="text-5xl font-black text-slate-900 mb-4">{stats.myCanchasCount} <span className="text-lg text-slate-300">/ {stats.tenantProfile?.plan?.maxCanchas || 1}</span></div>
-              <div className="flex items-center gap-2 text-xs font-black text-blue-600 bg-blue-50 px-3 py-1 rounded-full w-fit">
+            <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm hover:border-blue-500/30 transition-colors group">
+              <h4 className="text-slate-500 font-bold text-xs md:text-sm uppercase tracking-wider mb-2">Capacidad Utilizada</h4>
+              <div className="text-4xl md:text-5xl font-black text-slate-900 mb-4">{stats.myCanchasCount} <span className="text-base md:text-lg text-slate-300">/ {stats.tenantProfile?.plan?.maxCanchas || 1}</span></div>
+              <div className="flex items-center gap-2 text-[10px] md:text-xs font-black text-blue-600 bg-blue-50 px-3 py-1 rounded-full w-fit">
                 <Clock className="w-3 h-3" /> Límite de Plan: {stats.tenantProfile?.plan?.name || "Trial"}
               </div>
             </div>
           </div>
 
-          <div id="dashboard-public-link" className="bg-white p-8 rounded-[40px] border border-slate-100 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
-             <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-emerald-50 rounded-3xl flex items-center justify-center text-emerald-600 shadow-inner">
-                   <Globe className="w-8 h-8" />
+          <div id="dashboard-public-link" className="bg-white p-6 md:p-8 rounded-[32px] md:rounded-[40px] border border-slate-100 shadow-sm flex flex-col lg:flex-row items-center justify-between gap-6">
+             <div className="flex items-center gap-4 w-full lg:w-auto">
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-emerald-50 rounded-2xl md:rounded-3xl flex items-center justify-center text-emerald-600 shadow-inner flex-shrink-0">
+                   <Globe className="w-6 h-6 md:w-8 md:h-8" />
                 </div>
                 <div>
-                   <h3 className="text-xl font-black text-slate-900">Tu Página Web Pública</h3>
-                   <p className="text-slate-500 font-medium">Comparte este link con tus clientes para que reserven.</p>
+                   <h3 className="text-lg md:text-xl font-black text-slate-900">Tu Página Web Pública</h3>
+                   <p className="text-xs md:text-sm text-slate-500 font-medium">Comparte este link con tus clientes para que reserven.</p>
                 </div>
              </div>
-             <div className="flex gap-3 w-full md:w-auto">
-                <input readOnly value={`http://localhost:3000/c/${stats.tenantProfile?.slug || stats.tenantProfile?.id}`} className="bg-slate-50 border border-slate-200 px-4 py-3 rounded-2xl font-bold text-slate-600 flex-1 md:w-80" />
-                <Link href={`/c/${stats.tenantProfile?.slug || stats.tenantProfile?.id}`} className="bg-slate-900 text-white px-6 py-3 rounded-2xl font-black hover:bg-slate-800 transition-all flex items-center gap-2">
+             <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                <input readOnly value={`http://localhost:3000/c/${stats.tenantProfile?.slug || stats.tenantProfile?.id}`} className="bg-slate-50 border border-slate-200 px-4 py-3.5 rounded-2xl font-bold text-xs md:text-sm text-slate-600 w-full lg:w-80 truncate" />
+                <Link href={`/c/${stats.tenantProfile?.slug || stats.tenantProfile?.id}`} className="bg-slate-900 text-white px-6 py-3.5 rounded-2xl font-black text-sm hover:bg-slate-800 transition-all flex items-center justify-center gap-2 w-full sm:w-auto flex-shrink-0">
                    Visitar <ArrowRight className="w-4 h-4" />
                 </Link>
              </div>
@@ -204,22 +204,22 @@ export function CanchasManager({ canchas, tenantId, planLimit }: { canchas: any[
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      <div id="canchas-header" className="flex justify-between items-center bg-white p-8 rounded-[40px] border border-slate-100 shadow-sm">
+      <div id="canchas-header" className="flex flex-col sm:flex-row justify-between sm:items-center bg-white p-6 md:p-8 rounded-[32px] md:rounded-[40px] border border-slate-100 shadow-sm gap-6">
         <div>
-          <h3 className="text-2xl font-black text-slate-900">Mis Espacios Deportivos</h3>
-          <p className="text-slate-500 font-medium">Tienes {canchas.length} de {planLimit} canchas permitidas.</p>
+          <h3 className="text-xl md:text-2xl font-black text-slate-900">Mis Espacios Deportivos</h3>
+          <p className="text-xs md:text-sm text-slate-500 font-medium">Tienes {canchas.length} de {planLimit} canchas permitidas.</p>
         </div>
         <button 
           id="canchas-new-btn"
           onClick={() => setIsCreating(true)}
           disabled={canchas.length >= planLimit}
-          className={`flex items-center gap-2 px-8 py-4 rounded-2xl font-black text-lg transition-all shadow-xl ${
+          className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl font-black text-sm md:text-base transition-all shadow-xl w-full sm:w-auto ${
             canchas.length >= planLimit 
             ? "bg-slate-100 text-slate-400 cursor-not-allowed" 
             : "bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-600/20 active:scale-95"
           }`}
         >
-          <Plus className="w-6 h-6" /> Nueva Cancha
+          <Plus className="w-5 h-5" /> Nueva Cancha
         </button>
       </div>
 
