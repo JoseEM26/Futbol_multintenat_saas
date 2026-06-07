@@ -21,9 +21,17 @@ export function TenantAdminDashboard({ stats, user }: { stats: any, user: any })
   const [showTour, setShowTour] = useState(!user?.hasSeenTour);
   const [activeTourModule, setActiveTourModule] = useState<"DASHBOARD" | "CANCHAS" | "PERFIL" | "PERSONALIZAR">("DASHBOARD");
 
+  // Skip auto tour on mobile
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      setShowTour(false);
+    }
+  }, []);
+
   // Listen for "Ver Tutorial" button in sidebar
   useEffect(() => {
     const handler = () => {
+      if (typeof window !== "undefined" && window.innerWidth < 768) return; // omit on mobile
       setActiveTourModule(activeTab);
       setShowTour(true);
     };
